@@ -1,0 +1,18 @@
+#!/bin/sh /etc/rc.common
+# Copyright (C) 2010 Jo-Philipp Wich
+
+START=100
+
+USE_PROCD=1
+
+BREADMAKER_BIN=/usr/share/breadmaker/breadmaker.sh
+
+start_service() {
+	( ( $BREADMAKER_BIN > /dev/null & ) & )
+}
+
+stop_service() {
+	killall -q breadmaker.sh
+	killall -q tick.php
+}
+
