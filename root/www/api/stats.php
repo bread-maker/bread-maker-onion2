@@ -13,7 +13,12 @@
 
 		$stats_file_name = STATS_DIR . '/breadmaker_stats_' . $interval . '.json';
 		$stats_json = trim(@file_get_contents($stats_file_name));
-		if ($stats_json[strlen($stats_json)-1] == ',') $stats_json[strlen($stats_json)-1] = ' ';
+		if ($stats_json)
+		{
+			if ($stats_json[strlen($stats_json)-1] == ',') $stats_json[strlen($stats_json)-1] = ' ';
+		} else {
+			$stats_json = '';
+		}
 		$stats_json = '[' . $stats_json . ']';
 		$stats = json_decode($stats_json);
 		if (isset($_REQUEST['count']))
