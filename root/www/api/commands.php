@@ -77,7 +77,11 @@
 		if ($stats['stats'][0]->state == 'idle') error(ERROR_COMMUNICATION_TIMEOUT);
 		if ($stats['stats'][0]->state == 'error')
 			error(ERROR_REMOTE_ERROR, $stats['stats'][0]->error_code . ' - ' . $remote_errors[$stats['stats'][0]->error_code]);
-	
+
+		usleep(100000);
+		$stats = get_stats('last');
+
+		$full_info = json_encode($program);
 		unset($program->program_name);
 		$program->program_id = $program_id;
 		$program->crust_id = $crust_id;
@@ -98,6 +102,10 @@
 			abort(true);
 			error(ERROR_PROGRAM_CORRUPTED, $program_need . ' vs ' . $program_actual);
 		}
+
+		// Saving program with full info
+		$program_file_name = STATS_DIR . '/breadmaker_program.json';
+		file_put_contents($program_file_name, $full_info);
 
 		$result['result'] = true;
 	}

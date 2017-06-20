@@ -81,6 +81,7 @@ main()
   fi
 
   rm -f $STATS_DIR/breadmaker_stats_*
+  rm -f $STATS_DIR/breadmaker_program.json
   while read l; do
     echo "<- $l"
     local cmd=${l:0:5}

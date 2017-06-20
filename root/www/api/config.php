@@ -1,5 +1,5 @@
 <?php
-	define("EMULATION", 0);
+	define("EMULATION", 1);
 	define("HOME_DIR", "/usr/share/breadmaker/");
 	define("SETTINGS_DIR", HOME_DIR . "settings/");
 	define("TOKEN_DIR", "/tmp/");
@@ -7,7 +7,7 @@
 	define("STATS_DIR", "/tmp/");
 	define("PROGRAMS_COUNT", 7);
 	define("CRUSTS_COUNT", 3);
-	define("LOG_SIZE", 300);
+	define("LOG_SIZE", 500);
 	if (!EMULATION)
 	{
 		define("UART_OUT", "/dev/ttyS1");
