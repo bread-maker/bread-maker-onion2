@@ -1,6 +1,6 @@
 <?php
-	require_once('../config.php');
-	require_once('../consts.php');
+	require_once('config.php');
+	require_once('consts.php');
 	require_once('misc.php');
 
 	function emu_set_temp()

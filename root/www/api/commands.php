@@ -66,7 +66,7 @@
 		bmsend("WARMTIME {$program->max_warm_time}");
 		bmsend("RUN $program_id $crust_id $timer");
 
-		$timeout = 3000000;
+		$timeout = 5000000;
 		do
 		{
 			usleep(100000);
@@ -106,7 +106,7 @@
 	{
 		global $result, $remote_errors;
 		bmsend("ABORT");
-		$timeout = 3000000;
+		$timeout = 5000000;
 		require_once('stats.php');
 		do
 		{
