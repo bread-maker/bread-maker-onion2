@@ -18,8 +18,8 @@
 		}
 		if (!EMULATION)
 		{
-			$gpio = new PhpGpio\Gpio();
 			shell_exec("/etc/init.d/breadmaker stop");
+			$gpio = new PhpGpio\Gpio();
 			foreach(array(PIN_RESET, PIN_SCK, PIN_MOSI, PIN_MISO) as $pin)
 				$gpio->unexport($pin);
 			//$result['output'] = shell_exec("avrdude -p m16 -c linuxgpio -U flash:w:\"" . $_FILES['firmware']['tmp_name'] . "\"  -U lfuse:w:0x$lfuse:m -U hfuse:w:0x$hfuse:m -q 2>&1");

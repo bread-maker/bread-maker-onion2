@@ -8,12 +8,6 @@ load_config_var()
   $PHP -r "include('$API_DIR/config.php'); echo $1;"
 }
 
-start_tick()
-{
-  killall -q tick.php
-  ( ( nice -15 $HOME_DIR/tick.php $API_DIR & ) & )
-}
-
 bmsend()
 {
   echo $@ > $UART_OUT
@@ -78,9 +72,12 @@ reset()
 main()
 {
   if [ "$EMULATION" -eq "0" ]; then
-    start_tick
+    fast-gpio pwm $PIN_SCK 1 50
     stty -F $UART_OUT speed $UART_SETTINGS
     stty -F $UART_IN speed $UART_SETTINGS
+    trap "fast-gpio set-output $PIN_SCK" TERM KILL INT
+  else
+    $PHP emulator.php &
   fi
 
   rm -f $STATS_DIR/breadmaker_stats_*
@@ -120,6 +117,7 @@ cd $(dirname "$0")
 UART_OUT=`load_config_var UART_OUT`
 UART_IN=`load_config_var UART_IN`
 UART_SETTINGS=`load_config_var UART_SETTINGS`
+PIN_SCK=`load_config_var PIN_SCK`
 HOME_DIR=`load_config_var HOME_DIR`
 STATS_DIR=`load_config_var STATS_DIR`
 LOG_SIZE=`load_config_var LOG_SIZE`
