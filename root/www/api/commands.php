@@ -22,10 +22,10 @@
 
 		require_once('stats.php');
 		$stats = get_stats('last');
-		if ($stats['stats'][0]->state == 'error')
-			error(ERROR_REMOTE_ERROR, $stats['stats'][0]->error_code . ' - ' . $remote_errors[$stats['stats'][0]->error_code]);
-		if ($stats['stats'][0]->state != 'idle')
-			error(ERROR_INVALID_STATE, $stats['stats'][0]->state);
+		if ($stats['last']->state == 'error')
+			error(ERROR_REMOTE_ERROR, $stats['last']->error_code . ' - ' . $remote_errors[$stats['last']->error_code]);
+		if ($stats['last']->state != 'idle')
+			error(ERROR_INVALID_STATE, $stats['last']->state);
 
 		$config_file_name = SETTINGS_DIR . "/global_config.json";
 		$config_json = @file_get_contents($config_file_name);
@@ -72,21 +72,21 @@
 			usleep(100000);
 			$timeout -= 100000;
 			$stats = get_stats('last');
-		} while (($stats['stats'][0]->state == 'idle') && $timeout > 0);
+		} while (($stats['last']->state == 'idle') && $timeout > 0);
 
-		if ($stats['stats'][0]->state == 'idle') error(ERROR_COMMUNICATION_TIMEOUT);
-		if ($stats['stats'][0]->state == 'error')
-			error(ERROR_REMOTE_ERROR, $stats['stats'][0]->error_code . ' - ' . $remote_errors[$stats['stats'][0]->error_code]);
+		if ($stats['last']->state == 'idle') error(ERROR_COMMUNICATION_TIMEOUT);
+		if ($stats['last']->state == 'error')
+			error(ERROR_REMOTE_ERROR, $stats['last']->error_code . ' - ' . $remote_errors[$stats['last']->error_code]);
 
 		usleep(100000);
 		$stats = get_stats('last');
 
-		$full_info = json_encode($program);
 		unset($program->program_name);
 		$program->program_id = $program_id;
 		$program->crust_id = $crust_id;
-		$t = $stats['last_program']->program_id; unset($stats['last_program']->program_id); $stats['last_program']->program_id = $t;
-		$t = $stats['last_program']->crust_id; unset($stats['last_program']->crust_id); $stats['last_program']->crust_id = $t;
+		$last_program = get_program();
+		$t = $last_program->program_id; unset($last_program->program_id); $last_program->program_id = $t;
+		$t = $last_program->crust_id; unset($last_program->crust_id); $last_program->crust_id = $t;
 		foreach($program->stages as $k => $state)
 		{
 			unset($program->stages[$k]->stage_name);
@@ -95,17 +95,13 @@
 
 		// Need to verify that our baking program is not corrupted
 		$program_need = json_encode($program);
-		$program_actual = json_encode($stats['last_program']);
+		$program_actual = json_encode($last_program);
 		if (strcmp($program_need, $program_actual) != 0)
 		{
 			usleep(1500000);
 			abort(true);
 			error(ERROR_PROGRAM_CORRUPTED, $program_need . ' vs ' . $program_actual);
 		}
-
-		// Saving program with full info
-		$program_file_name = STATS_DIR . '/breadmaker_program.json';
-		file_put_contents($program_file_name, $full_info);
 
 		$result['result'] = true;
 	}
@@ -121,10 +117,10 @@
 			usleep(100000);
 			$timeout -= 100000;
 			$stats = get_stats('last');
-		} while (($stats['stats'][0]->state != 'idle') && $timeout > 0);
-		if ($stats['stats'][0]->state == 'error')
-			error(ERROR_REMOTE_ERROR, $stats['stats'][0]->error_code . ' - ' . $remote_errors[$stats['stats'][0]->error_code]);
-		if ($stats['stats'][0]->state != 'idle') error(ERROR_COMMUNICATION_TIMEOUT);
+		} while (($stats['last']->state != 'idle') && $timeout > 0);
+		if ($stats['last']->state == 'error')
+			error(ERROR_REMOTE_ERROR, $stats['last']->error_code . ' - ' . $remote_errors[$stats['last']->error_code]);
+		if ($stats['last']->state != 'idle') error(ERROR_COMMUNICATION_TIMEOUT);
 		if (!$ignore_result)
 			$result['result'] = true;
 	}
@@ -140,10 +136,10 @@
 			usleep(100000);
 			$timeout -= 100000;
 			$stats = get_stats('last');
-		} while (($stats['stats'][0]->state != 'idle') && $timeout > 0);
-		if ($stats['stats'][0]->state == 'error')
-			error(ERROR_REMOTE_ERROR, $stats['stats'][0]->error_code . ' - ' . $remote_errors[$stats['stats'][0]->error_code]);
-		if ($stats['stats'][0]->state != 'idle') error(ERROR_COMMUNICATION_TIMEOUT);
+		} while (($stats['last']->state != 'idle') && $timeout > 0);
+		if ($stats['last']->state == 'error')
+			error(ERROR_REMOTE_ERROR, $stats['last']->error_code . ' - ' . $remote_errors[$stats['last']->error_code]);
+		if ($stats['last']->state != 'idle') error(ERROR_COMMUNICATION_TIMEOUT);
 		$result['result'] = true;
 	}
 ?>

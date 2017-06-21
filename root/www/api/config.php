@@ -1,5 +1,5 @@
 <?php
-	define("EMULATION", 1);
+	define("EMULATION", 0);
 	define("HOME_DIR", "/usr/share/breadmaker/");
 	define("SETTINGS_DIR", HOME_DIR . "settings/");
 	define("TOKEN_DIR", "/tmp/");

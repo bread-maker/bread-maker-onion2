@@ -39,25 +39,28 @@ write_stats()
   sec15=$(($sec / 15))
   sec30=$(($sec / 30))
   min=$(($sec / 60))
+  min5=$(($sec / 300))
   stat={\"time\":$sec,$data}
   echo $stat > $STATS_DIR/breadmaker_stats_last.json
   [ "$sec" != "$last_sec" ] && echo $stat, >> $STATS_DIR/breadmaker_stats_sec.json      
-  [ "$sec5" != "$last_sec5" ] && echo $stat, >> $STATS_DIR/breadmaker_stats_5sec.json
-  [ "$sec15" != "$last_sec15" ] && echo $stat, >> $STATS_DIR/breadmaker_stats_15sec.json
-  [ "$sec30" != "$last_sec30" ] && echo $stat, >> $STATS_DIR/breadmaker_stats_30sec.json
+  [ "$sec5" != "$last_sec5" ] && $PHP grouplogs.php $API_DIR 5 >> $STATS_DIR/breadmaker_stats_5sec.json
+  [ "$sec15" != "$last_sec15" ] && $PHP grouplogs.php $API_DIR 15 >> $STATS_DIR/breadmaker_stats_15sec.json
+  [ "$sec30" != "$last_sec30" ] && $PHP grouplogs.php $API_DIR 30 >> $STATS_DIR/breadmaker_stats_30sec.json
   if [ "$min" != "$last_min" ]; then
-    echo $stat, >> $STATS_DIR/breadmaker_stats_min.json
+    $PHP grouplogs.php $API_DIR 60 >> $STATS_DIR/breadmaker_stats_min.json
     for f in $STATS_DIR/breadmaker_stats_*.json
     do 
       tail -n $LOG_SIZE $f > $f.tr
       mv -f $f.tr $f
     done
   fi
+  [ "$min5" != "$last_min5" ] && $PHP grouplogs.php $API_DIR 300 >> $STATS_DIR/breadmaker_stats_5min.json
   last_sec=$sec
   last_sec5=$sec5
   last_sec15=$sec15
   last_sec30=$sec30
   last_min=$min
+  last_min5=$min5
 }
 
 reset()
@@ -127,4 +130,3 @@ EMULATION=`load_config_var EMULATION`
 T=0
 
 main $@
-
