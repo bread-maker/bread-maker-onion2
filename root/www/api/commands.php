@@ -21,11 +21,11 @@
 		if ($timer < 0) error(ERROR_INVALID_ARGUMENT, 'timer');
 
 		require_once('stats.php');
-		$stats = get_stats('last');
-		if ($stats['last']->state == 'error')
-			error(ERROR_REMOTE_ERROR, $stats['last']->error_code . ' - ' . $remote_errors[$stats['last']->error_code]);
-		if ($stats['last']->state != 'idle')
-			error(ERROR_INVALID_STATE, $stats['last']->state);
+		$stats = get_stats();
+		if ($stats['last_status']->state == 'error')
+			error(ERROR_REMOTE_ERROR, $stats['last_status']->error_code . ' - ' . $remote_errors[$stats['last_status']->error_code]);
+		if ($stats['last_status']->state != 'idle')
+			error(ERROR_INVALID_STATE, $stats['last_status']->state);
 
 		$config_file_name = SETTINGS_DIR . "/global_config.json";
 		$config_json = @file_get_contents($config_file_name);
@@ -71,15 +71,15 @@
 		{
 			usleep(100000);
 			$timeout -= 100000;
-			$stats = get_stats('last');
-		} while (($stats['last']->state == 'idle') && $timeout > 0);
+			$stats = get_stats();
+		} while (($stats['last_status']->state == 'idle') && $timeout > 0);
 
-		if ($stats['last']->state == 'idle') error(ERROR_COMMUNICATION_TIMEOUT);
-		if ($stats['last']->state == 'error')
-			error(ERROR_REMOTE_ERROR, $stats['last']->error_code . ' - ' . $remote_errors[$stats['last']->error_code]);
+		if ($stats['last_status']->state == 'idle') error(ERROR_COMMUNICATION_TIMEOUT);
+		if ($stats['last_status']->state == 'error')
+			error(ERROR_REMOTE_ERROR, $stats['last_status']->error_code . ' - ' . $remote_errors[$stats['last_status']->error_code]);
 
 		usleep(100000);
-		$stats = get_stats('last');
+		$stats = get_stats();
 
 		unset($program->program_name);
 		$program->program_id = $program_id;
@@ -116,11 +116,11 @@
 		{
 			usleep(100000);
 			$timeout -= 100000;
-			$stats = get_stats('last');
-		} while (($stats['last']->state != 'idle') && $timeout > 0);
-		if ($stats['last']->state == 'error')
-			error(ERROR_REMOTE_ERROR, $stats['last']->error_code . ' - ' . $remote_errors[$stats['last']->error_code]);
-		if ($stats['last']->state != 'idle') error(ERROR_COMMUNICATION_TIMEOUT);
+			$stats = get_stats();
+		} while (($stats['last_status']->state != 'idle') && $timeout > 0);
+		if ($stats['last_status']->state == 'error')
+			error(ERROR_REMOTE_ERROR, $stats['last_status']->error_code . ' - ' . $remote_errors[$stats['last_status']->error_code]);
+		if ($stats['last_status']->state != 'idle') error(ERROR_COMMUNICATION_TIMEOUT);
 		if (!$ignore_result)
 			$result['result'] = true;
 	}
@@ -135,11 +135,11 @@
 		{
 			usleep(100000);
 			$timeout -= 100000;
-			$stats = get_stats('last');
-		} while (($stats['last']->state != 'idle') && $timeout > 0);
-		if ($stats['last']->state == 'error')
-			error(ERROR_REMOTE_ERROR, $stats['last']->error_code . ' - ' . $remote_errors[$stats['last']->error_code]);
-		if ($stats['last']->state != 'idle') error(ERROR_COMMUNICATION_TIMEOUT);
+			$stats = get_stats();
+		} while (($stats['last_status']->state != 'idle') && $timeout > 0);
+		if ($stats['last_status']->state == 'error')
+			error(ERROR_REMOTE_ERROR, $stats['last_status']->error_code . ' - ' . $remote_errors[$stats['last_status']->error_code]);
+		if ($stats['last_status']->state != 'idle') error(ERROR_COMMUNICATION_TIMEOUT);
 		$result['result'] = true;
 	}
 ?>

@@ -23,15 +23,20 @@
 	$target_temperature = 0;
 	$motor = 'off';
 	$heat = false;
+	$c = 0;
+	
 	foreach ($stats as $stat)
 	{
+		$last = $stat;
+		if (!isset($stat->temp))
+			continue;
 		$temperature += $stat->temp;
 		if ($stat->motor == 'on') $motor = 'on';
 			else if ($stat->motor == 'onoff' && $motor == 'off') $motor = 'onoff';
 		$heat = $heat | $stat->heat;
-		$last = $stat;
+		$c++;
 	}
-	$last->temp = count($stats) > 0 ? ($temperature / count($stats)) : 0;
+	$last->temp = $c > 0 ? ($temperature / $c) : 0;
 	$last->motor = $motor;
 	$last->heat = $heat;
 	echo(json_encode($last) . ",\n");

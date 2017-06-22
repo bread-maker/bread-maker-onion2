@@ -3,15 +3,8 @@
 	require_once('consts.php');
 	require_once('misc.php');
 
-	function stages_get()
+	function stage_get($program_id, $crust_id)
 	{
-		global $result;
-		if (!isset($_REQUEST['program_id']))
-			error(ERROR_MISSED_ARGUMENT, 'program_id');
-		if (!isset($_REQUEST['crust_id']))
-			error(ERROR_MISSED_ARGUMENT, 'crust_id');
-		$program_id = (int)$_REQUEST['program_id'];
-		$crust_id = (int)$_REQUEST['crust_id'];
 		if ($program_id >= PROGRAMS_COUNT) error(ERROR_INVALID_ARGUMENT, 'program');
 		if ($crust_id >= CRUSTS_COUNT) error(ERROR_INVALID_ARGUMENT, 'crust');
 		
@@ -19,6 +12,7 @@
 		$program_json = @file_get_contents($program_file_name);
 		$program = json_decode($program_json);
 
+		$result = array();
 		$result['program_id'] = $program_id;
 		$result['crust_id'] = $crust_id;
 		$result['program_name'] = '';
@@ -61,6 +55,32 @@
 			$result['warm_temp'] = $program->warm_temp;
 		if (isset($program->max_warm_time))
 			$result['max_warm_time'] = $program->max_warm_time;
+
+		return $result;
+	}
+
+	function stages_get()
+	{
+		global $result;
+		if (!isset($_REQUEST['program_id']))
+			error(ERROR_MISSED_ARGUMENT, 'program_id');
+		if (!isset($_REQUEST['crust_id']))
+			error(ERROR_MISSED_ARGUMENT, 'crust_id');
+		$program_id = (int)$_REQUEST['program_id'];
+		$crust_id = (int)$_REQUEST['crust_id'];
+		if ($program_id >= PROGRAMS_COUNT) error(ERROR_INVALID_ARGUMENT, 'program');
+		if ($crust_id >= CRUSTS_COUNT) error(ERROR_INVALID_ARGUMENT, 'crust');
+		$result['program'] = stage_get($program_id, $crust_id);
+	}
+
+	function stages_get_all()
+	{
+		global $result;
+		$programs = array();
+		for($program_id = 0; $program_id < PROGRAMS_COUNT; $program_id++)
+			for($crust_id = 0; $crust_id < CRUSTS_COUNT; $crust_id++)
+				$programs[] = stage_get($program_id, $crust_id);
+		$result['programs'] = $programs;
 	}
 
 	function stages_set()

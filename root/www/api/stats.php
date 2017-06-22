@@ -11,7 +11,7 @@
 		return json_decode($program_json);		
 	}
 
-	function get_stats($interval = 'sec', $count = 30)
+	function get_stats($interval = 'last', $count = 100)
 	{
 		global $remote_errors;
 
@@ -32,22 +32,30 @@
 			$program->max_warm_time = $program_r->max_warm_time;
 		} else $program = NULL;
 
-		$stats_file_name = STATS_DIR . '/breadmaker_stats_' . $interval . '.json';
-		$stats_json = trim(@file_get_contents($stats_file_name));
-		if ($stats_json)
+		if ($interval != 'last')
 		{
-			if ($stats_json[strlen($stats_json)-1] == ',') $stats_json[strlen($stats_json)-1] = ' ';
-		} else {
-			$stats_json = '';
-		}
-		$stats_json = '[' . $stats_json . ']';
-		$stats = json_decode($stats_json);
-		if (isset($_REQUEST['count']))
-			$count = (int)$_REQUEST['count'];
-		if ($count < count($stats))
-		{
-			$stats = array_slice($stats, count($stats) - $count);
-		}
+			$stats_file_name = STATS_DIR . '/breadmaker_stats_' . $interval . '.json';
+			$stats_json = trim(@file_get_contents($stats_file_name));
+			if ($stats_json)
+			{
+				if ($stats_json[strlen($stats_json)-1] == ',') $stats_json[strlen($stats_json)-1] = ' ';
+			} else {
+				$stats_json = '';
+			}
+			$stats_json = '[' . $stats_json . ']';
+			$stats = json_decode($stats_json);
+			if (isset($_REQUEST['count']))
+				$count = (int)$_REQUEST['count'];
+			if ($count < count($stats))
+			{
+				$stats = array_slice($stats, count($stats) - $count);
+			}
+			foreach($stats as $k => $stat)
+			{
+				if ($stats[$k]->state == 'error')
+					$stats[$k]->error_text = $remote_errors[$stats[$k]->error_code];
+			}
+		} else $stats = null;
 
 		$stats_file_name = STATS_DIR . '/breadmaker_stats_last.json';
 		$stats_json = trim(@file_get_contents($stats_file_name));
@@ -59,15 +67,10 @@
 		}
 		$last = json_decode($stats_json);
 
-		foreach($stats as $k => $stat)
-		{
-			if ($stats[$k]->state == 'error')
-				$stats[$k]->error_text = $remote_errors[$stats[$k]->error_code];
-		}
 		if ($last->state == 'error')
 			$last->error_text = $remote_errors[$last->error_code];
 
-		return array('last_program' => $program, 'stats' => $stats, 'last' => $last);
+		return array('last_program' => $program, 'stats' => $stats, 'last_status' => $last);
 	}
 
 	function stats()
@@ -96,6 +99,6 @@
 		
 		$result['last_program'] = $stats['last_program'];
 		$result['stats'] = $stats['stats'];
-		$result['last'] = $stats['last'];
+		$result['last_status'] = $stats['last_status'];
 	}
 ?>
