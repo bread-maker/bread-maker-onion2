@@ -22,4 +22,12 @@
 		bmsend("EMUTIME $time");
 		$result['result'] = true;
 	}
+
+	function emu_reset()
+	{
+		global $result;
+		bmsend("EMURESET");
+		array_map('unlink', glob(STATS_DIR . '/breadmaker_stats_*'));		
+		$result['result'] = true;
+	}
 ?>

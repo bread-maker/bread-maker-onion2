@@ -32,6 +32,7 @@
 		'firmware.flash' =>  array('firmware', 'flash'),
 		'emu.temp' =>  array('emucontrol', 'emu_set_temp'),
 		'emu.time' =>  array('emucontrol', 'emu_skip_time'),
+		'emu.reset' =>  array('emucontrol', 'emu_reset'),
 	);
 
 	if (!isset($_REQUEST['method'])) error(ERROR_NO_METHOD);

@@ -90,7 +90,7 @@ $recv_buffer = '';
 
 function recv_routine()
 {
-	global $fifo_in, $recv_buffer, $current_state, $baking_program, $baking_program, $baking_beeps, $max_temperature_before_timer, $max_temperature_before_baking, $warming_temperature, $warming_max_time, $cmd_start, $cmd_abort, $cmd_abort_err, $program_number, $crust_number, $delayed_secs, $passed_secs, $current_temperature, $heat_speed, $emu_time_skip;
+	global $fifo_in, $recv_buffer, $current_state, $baking_program, $baking_program, $baking_beeps, $max_temperature_before_timer, $max_temperature_before_baking, $warming_temperature, $warming_max_time, $cmd_start, $cmd_abort, $cmd_abort_err, $program_number, $crust_number, $delayed_secs, $passed_secs, $current_temperature, $heat_speed, $emu_time_skip, $emu_time_skiped;
 	$data = fread($fifo_in, 1024);
 	if ($data)
 	{
@@ -153,6 +153,9 @@ function recv_routine()
 					break;
 				case 'EMUTIME':
 					$emu_time_skip = $args[1];
+					break;
+				case 'EMURESET':
+					$emu_time_skiped = 0;
 					break;
 			}
 		}
