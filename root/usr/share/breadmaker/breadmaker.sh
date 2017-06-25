@@ -1,6 +1,6 @@
-#!/bin/sh
+#!/bin/bash
 
-API_DIR=/www/api/
+API_DIR=/home/lolmaus/Code/bread-maker/bread-maker-onion2/root/www/api
 PHP=php-cli
 
 load_config_var()
@@ -81,6 +81,7 @@ main()
     trap "fast-gpio set-output $PIN_SCK" TERM KILL INT
   else
     $PHP emulator.php &
+    trap "kill $!" TERM KILL INT
   fi
 
   rm -f $STATS_DIR/breadmaker_stats_*

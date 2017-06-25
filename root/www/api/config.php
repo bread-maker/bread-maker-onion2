@@ -1,7 +1,7 @@
 <?php
-	define("EMULATION", 0);
-	define("HOME_DIR", "/usr/share/breadmaker/");
-	define("SETTINGS_DIR", HOME_DIR . "settings/");
+	define("EMULATION", 1);
+	define("HOME_DIR", "/home/lolmaus/Code/bread-maker/bread-maker-onion2/root/usr/share/breadmaker");
+	define("SETTINGS_DIR", HOME_DIR . "/settings/");
 	define("TOKEN_DIR", "/tmp/");
 	define("TOKEN_LIFETIME", 3600);
 	define("STATS_DIR", "/tmp/");
