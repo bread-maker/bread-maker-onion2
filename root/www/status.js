@@ -259,10 +259,9 @@
 					catch(e) {							
 					}
 				}
+				update_timer = window.setTimeout(request, 5000);
 			}
 		}
-
-		update_timer = window.setTimeout(request, 1000);
 		r.send(null);
 	}	
 	
