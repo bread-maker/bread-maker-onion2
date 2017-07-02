@@ -1,7 +1,7 @@
 #!/bin/sh
 
 API_DIR=/www/api/
-PHP=php
+PHP=${PHP:-php-cli}
 
 load_config_var()
 {

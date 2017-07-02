@@ -2,6 +2,8 @@ FROM php:alpine
 
 EXPOSE 8000
 
+ENV PHP php
+
 ADD root/etc /etc
 ADD root/usr /usr
 ADD root/www /www
