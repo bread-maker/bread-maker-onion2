@@ -3,6 +3,7 @@ FROM php:alpine
 EXPOSE 8000
 
 ENV PHP php
+ENV EMULATTION true
 
 ADD root/etc /etc
 ADD root/usr /usr
