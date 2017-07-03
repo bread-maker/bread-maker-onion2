@@ -20,8 +20,8 @@ jobs:
           name: add executable flag to breadmaker
           command: 'chmod 0777 /usr/share/breadmaker/breadmaker.sh'
       - run:
-          name: install nmp dependencies
+          name: install phpunit
           command: 'curl -sSL https://phar.phpunit.de/phpunit.phar -o phpunit.phar && chmod +x phpunit.phar && mv phpunit.phar /usr/local/bin/phpunit'
       - run:
-          name: run tests
+          name: run phpunit
           command: 'phpunit .'
