@@ -9,10 +9,10 @@ jobs:
       - EMULATION: "true"
     steps:
       - checkout:
-          path: /tmp/
+          path: /tmp/bm
       - run:
           name: move files to corresponding dirs
-          command: 'mv /tmp/root/usr/* /usr/ && mv /tmp/root/etc/* /etc && mv /tmp/root/www/* /www'
+          command: 'mv /tmp/bm/root/usr/* /usr/ && mv /tmp/bm/root/etc/* /etc && mv /tmp/bm/root/www/* /www'
       - run:
           name: make file for components communication
           command: 'mknod /tmp/breadmaker_from_device p'
