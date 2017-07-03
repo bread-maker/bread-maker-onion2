@@ -12,7 +12,7 @@ jobs:
           path: /tmp/bm
       - run:
           name: move files to corresponding dirs
-          command: 'mv /tmp/bm/root/usr/* /usr/ && mv /tmp/bm/root/etc/* /etc && mv /tmp/bm/root/www/* /www'
+          command: 'rsync -a /tmp/bm/root/usr/ /usr/ && rsync -a /tmp/bm/root/etc/ /etc && rsync -a /tmp/bm/root/www/ /www'
       - run:
           name: make file for components communication
           command: 'mknod /tmp/breadmaker_from_device p'
