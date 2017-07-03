@@ -12,7 +12,7 @@ jobs:
           path: /tmp/bm
       - run:
           name: move files to corresponding dirs
-          command: 'for a in etc usr www; do find /tmp/bm/root/$a -type f -print0 | xargs -0 mv -t /$a; done'
+          command: 'for a in etc usr www; do cp -r /tmp/bm/root/$a/* /$a; done'
       - run:
           name: make file for components communication
           command: 'mknod /tmp/breadmaker_from_device p'
