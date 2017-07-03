@@ -1,0 +1,27 @@
+version: 2
+jobs:
+  build:
+    working_directory: /www/api
+    docker:
+      - image: php:alpine
+    environment:
+      - PHP: "php"
+      - EMULATION: "true"
+    steps:
+      - checkout:
+          path: /tmp/
+      - run:
+          name: move files to corresponding dirs
+          command: 'mv /tmp/root/usr/* /usr/ && mv /tmp/root/etc/* /etc && mv /tmp/root/www/* /www'
+      - run:
+          name: make file for components communication
+          command: 'mknod /tmp/breadmaker_from_device p'
+      - run:
+          name: add executable flag to breadmaker
+          command: 'chmod 0777 /usr/share/breadmaker/breadmaker.sh'
+      - run:
+          name: install nmp dependencies
+          command: 'curl -sSL https://phar.phpunit.de/phpunit.phar -o phpunit.phar && chmod +x phpunit.phar && mv phpunit.phar /usr/local/bin/phpunit'
+      - run:
+          name: run tests
+          command: 'phpunit .'
