@@ -91,7 +91,7 @@
 		if (!isset($_REQUEST['crust_id']))
 			error(ERROR_MISSED_ARGUMENT, 'crust_id');
 		if (!isset($_REQUEST['program']))
-			error(ERROR_MISSED_ARGUMENT, 'program_code');
+			error(ERROR_MISSED_ARGUMENT, 'program');
 		$program_id = (int)$_REQUEST['program_id'];
 		$crust_id = (int)$_REQUEST['crust_id'];
 		if ($program_id >= PROGRAMS_COUNT) error(ERROR_INVALID_ARGUMENT, 'program');
