@@ -1,5 +1,6 @@
 <?php
 	header('Content-Type: application/json');
+	header("access-control-allow-origin: *");
 	error_reporting(0);
 	require_once('auth.php');
 
