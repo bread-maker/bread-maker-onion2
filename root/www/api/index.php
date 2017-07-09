@@ -1,10 +1,15 @@
 <?php
 	header('Content-Type: application/json');
-	header('access-control-allow-origin: *');
-	error_reporting(E_ALL);
-	ini_set('display_errors', '1');
-
+	header("access-control-allow-origin: *");
+	error_reporting(0);
 	require_once('auth.php');
+
+	foreach($_REQUEST as $k => $v)
+	{
+		if (gettype($v) == 'array')
+			$_REQUEST[$k] = json_encode($v);
+	}
+
 
 	$methods = array(
 		'auth.login' => array('auth', 'auth'),
@@ -33,7 +38,6 @@
 		'firmware.flash' =>  array('firmware', 'flash'),
 		'emu.temp' =>  array('emucontrol', 'emu_set_temp'),
 		'emu.time' =>  array('emucontrol', 'emu_skip_time'),
-		'emu.reset' =>  array('emucontrol', 'emu_reset'),
 	);
 
 	if (!isset($_REQUEST['method'])) error(ERROR_NO_METHOD);
@@ -46,8 +50,15 @@
 	
 	$result = array();
 
-	require_once($methods[$method][0] . '.php');
-	$methods[$method][1]();
+	try
+	{
+		require_once($methods[$method][0] . '.php');
+		$methods[$method][1]();
+	}
+	catch (Exception $e)
+	{
+		error(ERROR_INTERNAL_EXCEPTION, $e->getMessage());
+	}
 
 	echo(json_encode($result));
 ?>

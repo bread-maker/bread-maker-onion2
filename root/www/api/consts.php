@@ -11,6 +11,7 @@
 	define("ERROR_INVALID_STATE", array('error_code' => 19, 'error_text' => 'Invalid baking state'));
 	define("ERROR_COMMUNICATION_TIMEOUT", array('error_code' => 20, 'error_text' => 'Communication timeout'));
 	define("ERROR_PROGRAM_CORRUPTED", array('error_code' => 21, 'error_text' => 'Baking program corrupted'));
+	define("ERROR_INTERNAL_EXCEPTION", array('error_code' => 22, 'error_text' => 'Internal exception'));
 
 	$remote_errors = array(
 		1 => 'Power was lost during baking',

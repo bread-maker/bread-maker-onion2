@@ -24,5 +24,5 @@
 	<polyline id="heat" points="" style="fill:#FF0000;fill-opacity:1;stroke:#FF0000;stroke-width:1" />
 	<polyline id="motor" points="" style="fill:#0000FF;fill-opacity:0.5;stroke:#0000FF;stroke-width:1" />
 
-	<text id="loading" x="50%" y="50%" style="fill:#000000; font-size:30pt">Loading...</text>
+	<text id="loading" text-anchor="middle" x="50%" y="50%" style="fill:#000000; font-size:30pt">Loading...</text>
 </svg>
