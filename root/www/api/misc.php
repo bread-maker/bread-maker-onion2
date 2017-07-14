@@ -10,6 +10,11 @@
 	function error($error, $what = '')
 	{
 		if (strlen($what) > 0) $error['error_text'] .= ': ' . $what; 
+		if (isset($error['http_response_code']))
+		{
+			http_response_code($error['http_response_code']);
+			unset($error['http_response_code']);
+		}
 		die(json_encode(array('error' => $error)));
 	}
 
