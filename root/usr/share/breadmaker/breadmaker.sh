@@ -80,6 +80,8 @@ main()
     stty -F $UART_IN speed $UART_SETTINGS
     trap "fast-gpio set-output $PIN_SCK" TERM KILL INT
   else
+    [ -p $UART_OUT ] || mkfifo $UART_OUT
+    [ -p $UART_IN ] || mkfifo $UART_IN
     $PHP emulator.php &
     EMU_PID=$!
     trap "kill $EMU_PID" TERM KILL INT

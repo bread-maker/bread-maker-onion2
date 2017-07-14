@@ -15,10 +15,6 @@ define('MOTOR_IMPULSE', 'onoff');
 define('MOTOR_RUNNING', 'on');
 
 echo("Staring emulation...\n");
-//if (file_exists($fifo_out_path)) unlink($fifo_out_path);
-//if (file_exists($fifo_in_path)) unlink($fifo_in_path);
-posix_mkfifo($fifo_out_path, 0666);
-posix_mkfifo($fifo_in_path, 0666);
 $fifo_out = fopen($fifo_out_path, 'w');
 $fifo_in = fopen($fifo_in_path, 'r+');
 stream_set_blocking($fifo_in, false);
