@@ -5,8 +5,8 @@
 
 	function stage_get($program_id, $crust_id)
 	{
-		if ($program_id >= PROGRAMS_COUNT) error(ERROR_INVALID_ARGUMENT, 'program');
-		if ($crust_id >= CRUSTS_COUNT) error(ERROR_INVALID_ARGUMENT, 'crust');
+		if ($program_id >= PROGRAMS_COUNT) error(ERROR_INVALID_ARGUMENT, 'program_id');
+		if ($crust_id >= CRUSTS_COUNT) error(ERROR_INVALID_ARGUMENT, 'crust_id');
 		
 		$program_file_name = SETTINGS_DIR . "/program.$program_id.$crust_id.json";
 		$program_json = @file_get_contents($program_file_name);
@@ -68,8 +68,8 @@
 			error(ERROR_MISSED_ARGUMENT, 'crust_id');
 		$program_id = (int)$_REQUEST['program_id'];
 		$crust_id = (int)$_REQUEST['crust_id'];
-		if ($program_id >= PROGRAMS_COUNT) error(ERROR_INVALID_ARGUMENT, 'program');
-		if ($crust_id >= CRUSTS_COUNT) error(ERROR_INVALID_ARGUMENT, 'crust');
+		if ($program_id >= PROGRAMS_COUNT) error(ERROR_INVALID_ARGUMENT, 'program_id');
+		if ($crust_id >= CRUSTS_COUNT) error(ERROR_INVALID_ARGUMENT, 'crust_id');
 		$result['program'] = stage_get($program_id, $crust_id);
 	}
 

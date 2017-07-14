@@ -50,4 +50,34 @@
 		}
 		$result['result'] = true;
 	}
+
+	function config_misc_get()
+	{
+		global $result;
+		$settings_file_name = SETTINGS_DIR . "/settings.json";
+		$settings_json = @file_get_contents($settings_file_name);
+		$settings = json_decode($settings_json);
+		$result['config'] = $settings;
+	}
+
+	function config_misc_set()
+	{
+		global $result;
+		if (!isset($_REQUEST['key']))
+			error(ERROR_MISSED_ARGUMENT, 'key');
+		$key = $_REQUEST['key'];
+		if (!isset($_REQUEST['value']))
+			error(ERROR_MISSED_ARGUMENT, 'value');
+		$value = $_REQUEST['value'];
+
+		$settings_file_name = SETTINGS_DIR . "/settings.json";
+		$settings_json = @file_get_contents($settings_file_name);
+		$settings = json_decode($settings_json);
+		if ($value)
+			$settings->$key = $value;
+		else
+			unset($settings->$key);
+		file_put_contents($settings_file_name, json_encode($settings));
+		$result['config'] = $settings;
+	}
 ?>
