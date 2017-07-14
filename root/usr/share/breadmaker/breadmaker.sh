@@ -81,7 +81,8 @@ main()
     trap "fast-gpio set-output $PIN_SCK" TERM KILL INT
   else
     $PHP emulator.php &
-    trap "kill $!" TERM KILL INT
+    EMU_PID=$!
+    trap "kill $EMU_PID" TERM KILL INT
   fi
 
   rm -f $STATS_DIR/breadmaker_stats_*
