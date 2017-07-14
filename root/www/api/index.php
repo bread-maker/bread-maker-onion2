@@ -26,7 +26,7 @@
 		'config.wifi.aps.edit' => array('wifi', 'wifi_client_aps_edit'),
 		'config.wifi.aps.delete' => array('wifi', 'wifi_client_aps_delete'),
 		'config.timezone.get' =>  array('misc', 'timezone_get'),
-		'config.timezone.set' =>  array('misc', 'timezone_set'),
+		'config.timezone.set' =>  array('misc', 'timezone_set', 'noauth' => true),
 		'config.baking.global.get' => array('programs', 'global_config_get'),
 		'config.baking.global.set' => array('programs', 'global_config_set'),
 		'config.baking.stages.get' => array('programs', 'stages_get'),
