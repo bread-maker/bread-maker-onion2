@@ -33,8 +33,11 @@ baked()
 write_stats()
 {
   local data=$@
-  sec=$(date +%s)
-  sec=$(($sec + $T))
+  if [ "$EMULATION" -eq "0" ]; then
+  	sec=$(date +%s)
+  else
+  	sec=$(($START_TIME + $T))
+  fi
   sec5=$(($sec / 5))
   sec15=$(($sec / 15))
   sec30=$(($sec / 30))
@@ -117,6 +120,15 @@ main()
       "SKIPT")
         T=$data
        ;;
+      "SKIPL")
+        echo $data > $STATS_DIR/breadmaker_skipl
+       ;;
+      "EMURS")
+        START_TIME=$data
+	rm -f $STATS_DIR/breadmaker_stats_*
+	rm -f $STATS_DIR/breadmaker_program.json
+        T=0
+       ;;
     esac
   done <$UART_IN
 }
@@ -131,6 +143,7 @@ STATS_DIR=`load_config_var STATS_DIR`
 LOG_SIZE=`load_config_var LOG_SIZE`
 SETTINGS_DIR=`load_config_var SETTINGS_DIR`
 EMULATION=`load_config_var EMULATION`
+START_TIME=$(date +%s)
 T=0
 
 main $@
