@@ -41,4 +41,14 @@
 		sleep(2);
 		$result['result'] = true;
 	}
+
+	function emu_error()
+	{
+		global $result;
+		if (!isset($_REQUEST['errno']))
+			error(ERROR_MISSED_ARGUMENT, 'errno');
+		$errno = (int)$_REQUEST['errno'];
+		bmsend("EMUERROR $errno");
+		$result['result'] = true;
+	}
 ?>

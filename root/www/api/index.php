@@ -39,6 +39,7 @@
 		'emu.temp' =>  array('emucontrol', 'emu_set_temp'),
 		'emu.time' =>  array('emucontrol', 'emu_skip_time'),
 		'emu.reset' =>  array('emucontrol', 'emu_reset'),
+		'emu.error' =>  array('emucontrol', 'emu_error'),
 	);
 
 	if (!isset($_REQUEST['method'])) error(ERROR_NO_METHOD);

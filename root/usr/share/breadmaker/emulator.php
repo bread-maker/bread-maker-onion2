@@ -158,6 +158,9 @@ function recv_routine()
 					$last_stuff_time = -1;
 					send("EMURS {$args[1]}");
 					break;
+				case 'EMUERROR':
+					show_error($args[1]);
+					break;
 			}
 		}
 	}
@@ -294,8 +297,8 @@ function show_error($errno)
 	$motor_state = MOTOR_STOPPED;
 	while (!$cmd_abort_err)
 	{
-		sleep(1);
 		do_stuff();
+		usleep(1000);
 	}
 	$cmd_abort = 1;
 }
