@@ -31,22 +31,22 @@
 		$config_json = @file_get_contents($config_file_name);
 		$config = json_decode($config_json);
 
-		$max_temp_a = $config->max_temp_a;
-		$max_temp_b = $config->max_temp_b;
-		$warm_temp = $config->warm_temp;
-		$max_warm_time = $config->max_warm_time;
+		$max_temp_a = (int)$config->max_temp_a;
+		$max_temp_b = (int)$config->max_temp_b;
+		$warm_temp = (int)$config->warm_temp;
+		$max_warm_time = (int)$config->max_warm_time;
 		
 		$program_file_name = SETTINGS_DIR . "/program.$program_id.$crust_id.json";
 		$program_json = @file_get_contents($program_file_name);
 		$program = json_decode($program_json);
 
-		if (!isset($program->max_temp_a) || ($program->max_temp_a <= 0))
+		if (!isset($program->max_temp_a) || ($program->max_temp_a === null) || ($program->max_temp_a <= 0))
 			$program->max_temp_a = $max_temp_a;
-		if (!isset($program->max_temp_b) || ($program->max_temp_b <= 0))
+		if (!isset($program->max_temp_b) || ($program->max_temp_b === null) || ($program->max_temp_b <= 0))
 			$program->max_temp_b = $max_temp_b;
-		if (!isset($program->warm_temp) || ($program->warm_temp < 0))
+		if (!isset($program->warm_temp) || ($program->warm_temp === null) || ($program->warm_temp < 0))
 			$program->warm_temp = $warm_temp;
-		if (!isset($program->max_warm_time) || ($program->max_warm_time < 0))
+		if (!isset($program->max_warm_time) || ($program->max_warm_time === null) || ($program->max_warm_time < 0))
 			$program->max_warm_time = $max_warm_time;
 		bmsend("NEW");
 		bmsend("MAXTEMPA {$program->max_temp_a}");

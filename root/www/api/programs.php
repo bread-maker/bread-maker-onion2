@@ -16,18 +16,18 @@
 		$result['program_id'] = $program_id;
 		$result['crust_id'] = $crust_id;
 		$result['program_name'] = '';
-		$result['max_temp_a'] = -1;
-		$result['max_temp_b'] = -1;
+		$result['max_temp_a'] = null;
+		$result['max_temp_b'] = null;
 		$result['stages'] = array();
 		$result['beeps'] = array();
-		$result['warm_temp'] = -1;
-		$result['max_warm_time'] = -1;
+		$result['warm_temp'] = null;
+		$result['max_warm_time'] = null;
 
 		if (isset($program->program_name))
 			$result['program_name'] = $program->program_name;
-		if (isset($program->max_temp_a))
+		if (isset($program->max_temp_a) && ($program->max_temp_a !== null) && ($program->max_temp_a > 0))
 			$result['max_temp_a'] = $program->max_temp_a;
-		if (isset($program->max_temp_b))
+		if (isset($program->max_temp_b) && ($program->max_temp_b !== null) && ($program->max_temp_b > 0))
 			$result['max_temp_b'] = $program->max_temp_b;
 		if (isset($program->stages))
 		{
@@ -36,7 +36,7 @@
 			{
 				//$result['stages'][$id]['stage_id'] = $id;
 				$result['stages'][$id]['stage_name'] = $stage->stage_name;
-				$result['stages'][$id]['temp'] = $stage->temp;
+				$result['stages'][$id]['temp'] = $stage->temp ? $stage->temp : null;
 				$result['stages'][$id]['motor'] = $stage->motor;
 				$result['stages'][$id]['duration'] = $stage->duration;
 				$id++;
@@ -51,9 +51,9 @@
 					'count' => $beep->count
 				);
 		}
-		if (isset($program->warm_temp))
+		if (isset($program->warm_temp) && ($program->warm_temp !== null) && ($program->warm_temp >= 0))
 			$result['warm_temp'] = $program->warm_temp;
-		if (isset($program->max_warm_time))
+		if (isset($program->max_warm_time) && ($program->max_warm_time !== null) && ($program->max_warm_time >= 0))
 			$result['max_warm_time'] = $program->max_warm_time;
 
 		return $result;
@@ -99,12 +99,12 @@
 		$program = json_decode($_REQUEST['program']);
 		$program_out = array();
 		$program_out['program_name'] = '';
-		$program_out['max_temp_a'] = -1;
-		$program_out['max_temp_b'] = -1;
+		$program_out['max_temp_a'] = null;
+		$program_out['max_temp_b'] = null;
 		$program_out['stages'] = array();
 		$program_out['beeps'] = array();
-		$program_out['warm_temp'] = -1;
-		$program_out['max_warm_time'] = -1;
+		$program_out['warm_temp'] = null;
+		$program_out['max_warm_time'] = null;
 
 		if (isset($program->program_name))
 			$program_out['program_name'] = $program->program_name;
@@ -119,7 +119,7 @@
 			{
 				$program_out['stages'][$id]['stage_id'] = $id;
 				$program_out['stages'][$id]['stage_name'] = $stage->stage_name;
-				$program_out['stages'][$id]['temp'] = $stage->temp;
+				$program_out['stages'][$id]['temp'] = (int)$stage->temp;
 				$program_out['stages'][$id]['motor'] = $stage->motor;
 				$program_out['stages'][$id]['duration'] = $stage->duration;
 				$id++;
@@ -185,7 +185,7 @@
 			}
 			if (isset($_REQUEST[$key]))
 			{
-				$old_config->$key = $_REQUEST[$key];
+				$old_config->$key = (int)$_REQUEST[$key];
 			}
 		}
 		file_put_contents($config_file_name, json_encode($old_config));
