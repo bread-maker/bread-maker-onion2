@@ -1,7 +1,7 @@
 #!/bin/sh
 
 API_DIR=/www/api/
-PHP=php-cli
+PHP=${PHP:-php-cli}
 
 load_config_var()
 {
@@ -77,7 +77,7 @@ reset()
 
 main()
 {
-  if [ "$EMULATION" -eq "0" ]; then
+  if [ -z "$EMULATION" ]; then
     fast-gpio pwm $PIN_SCK 1 50
     stty -F $UART_OUT speed $UART_SETTINGS
     stty -F $UART_IN speed $UART_SETTINGS

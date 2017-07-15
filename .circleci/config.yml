@@ -1,0 +1,30 @@
+version: 2
+jobs:
+  build:
+    working_directory: /www/api
+    docker:
+      - image: php:alpine
+    environment:
+      - PHP: "php"
+      - EMULATION: "true"
+    steps:
+      - checkout:
+          path: /tmp/bm
+      - run:
+          name: move files to corresponding dirs
+          command: 'for a in etc usr www; do cp -r /tmp/bm/root/$a/* /$a; done'
+      - run:
+          name: make file for components communication
+          command: 'mknod /tmp/breadmaker_from_device p'
+      - run:
+          name: add executable flag to breadmaker
+          command: 'chmod 0777 /usr/share/breadmaker/breadmaker.sh'
+      - run:
+          name: install phpunit
+          command: 'curl -sSL https://phar.phpunit.de/phpunit.phar -o phpunit.phar && chmod +x phpunit.phar && mv phpunit.phar /usr/local/bin/phpunit'
+      - run:
+          name: run phpunit
+          command: 'phpunit .'
+notify:
+  webhooks:
+    - url: https://webhooks.gitter.im/e/79c1b97c31cf7a8f96d7
