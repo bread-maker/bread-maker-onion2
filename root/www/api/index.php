@@ -25,8 +25,10 @@
 		'config.wifi.aps.add' => array('wifi', 'wifi_client_aps_add'),
 		'config.wifi.aps.edit' => array('wifi', 'wifi_client_aps_edit'),
 		'config.wifi.aps.delete' => array('wifi', 'wifi_client_aps_delete'),
-		'config.timezone.get' =>  array('misc', 'timezone_get'),
+		'config.timezone.get' =>  array('misc', 'timezone_get', 'noauth' => true),
 		'config.timezone.set' =>  array('misc', 'timezone_set'),
+		'config.misc.get' =>  array('misc', 'config_misc_get', 'noauth' => true),
+		'config.misc.set' =>  array('misc', 'config_misc_set'),
 		'config.baking.global.get' => array('programs', 'global_config_get'),
 		'config.baking.global.set' => array('programs', 'global_config_set'),
 		'config.baking.stages.get' => array('programs', 'stages_get'),
@@ -38,6 +40,8 @@
 		'firmware.flash' =>  array('firmware', 'flash'),
 		'emu.temp' =>  array('emucontrol', 'emu_set_temp'),
 		'emu.time' =>  array('emucontrol', 'emu_skip_time'),
+		'emu.reset' =>  array('emucontrol', 'emu_reset'),
+		'emu.error' =>  array('emucontrol', 'emu_error'),
 	);
 
 	if (!isset($_REQUEST['method'])) error(ERROR_NO_METHOD);

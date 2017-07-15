@@ -54,6 +54,8 @@
 			{
 				if ($stats[$k]->state == 'error')
 					$stats[$k]->error_text = $remote_errors[$stats[$k]->error_code];
+				if ($stats[$k]->target_temp == 0)
+					$stats[$k]->target_temp = null;
 			}
 		} else $stats = null;
 
@@ -69,6 +71,8 @@
 
 		if ($last->state == 'error')
 			$last->error_text = $remote_errors[$last->error_code];
+		if ($last->target_temp == 0)
+			$last->target_temp = null;
 
 		return array('last_program' => $program, 'stats' => $stats, 'last_status' => $last);
 	}

@@ -20,6 +20,35 @@
 			error(ERROR_MISSED_ARGUMENT, 'time');
 		$time = (int)$_REQUEST['time'];
 		bmsend("EMUTIME $time");
+		$timeout = $time;
+		sleep(2);
+		while (trim(@file_get_contents(STATS_DIR . '/breadmaker_skipl')) != '0')
+		{
+			sleep(1);
+			$timeout--;
+			if ($timeout <= 0) error(ERROR_TIMEOUT);
+		}
+		$result['result'] = true;
+	}
+
+	function emu_reset()
+	{
+		global $result;
+		$time = time();
+		if (isset($_REQUEST['time']))
+			$time = (int)$_REQUEST['time'];
+		bmsend("EMURESET $time");
+		sleep(2);
+		$result['result'] = true;
+	}
+
+	function emu_error()
+	{
+		global $result;
+		if (!isset($_REQUEST['errno']))
+			error(ERROR_MISSED_ARGUMENT, 'errno');
+		$errno = (int)$_REQUEST['errno'];
+		bmsend("EMUERROR $errno");
 		$result['result'] = true;
 	}
 ?>

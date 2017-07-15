@@ -15,10 +15,6 @@ define('MOTOR_IMPULSE', 'onoff');
 define('MOTOR_RUNNING', 'on');
 
 echo("Staring emulation...\n");
-//if (file_exists($fifo_out_path)) unlink($fifo_out_path);
-//if (file_exists($fifo_in_path)) unlink($fifo_in_path);
-posix_mkfifo($fifo_out_path, 0666);
-posix_mkfifo($fifo_in_path, 0666);
 $fifo_out = fopen($fifo_out_path, 'w');
 $fifo_in = fopen($fifo_in_path, 'r+');
 stream_set_blocking($fifo_in, false);
@@ -32,7 +28,7 @@ $baking_beeps = array();
 $baking_current_stage = 0;
 //$baking_beeps_count = 0;
 $current_stage_time = 0;
-$last_stuff_time = 0;
+$last_stuff_time = -1;
 $program_number = 0;
 $crust_number = 0;
 $delayed_secs = 0;
@@ -90,7 +86,7 @@ $recv_buffer = '';
 
 function recv_routine()
 {
-	global $fifo_in, $recv_buffer, $current_state, $baking_program, $baking_program, $baking_beeps, $max_temperature_before_timer, $max_temperature_before_baking, $warming_temperature, $warming_max_time, $cmd_start, $cmd_abort, $cmd_abort_err, $program_number, $crust_number, $delayed_secs, $passed_secs, $current_temperature, $heat_speed, $emu_time_skip, $emu_time_skiped;
+	global $fifo_in, $recv_buffer, $current_state, $baking_program, $baking_program, $baking_beeps, $max_temperature_before_timer, $max_temperature_before_baking, $warming_temperature, $warming_max_time, $cmd_start, $cmd_abort, $cmd_abort_err, $program_number, $crust_number, $delayed_secs, $passed_secs, $current_temperature, $heat_speed, $emu_time_skip, $emu_time_skipped, $last_stuff_time;
 	$data = fread($fifo_in, 1024);
 	if ($data)
 	{
@@ -144,7 +140,7 @@ function recv_routine()
 				case 'ABORT':
 					$cmd_abort = 1;
 					break;
-				case 'NORTT':
+				case 'NOERR':
 					$cmd_abort_err = 1;
 					break;
 				case 'EMUTEMP':
@@ -155,7 +151,15 @@ function recv_routine()
 					$emu_time_skip = $args[1];
 					break;
 				case 'EMURESET':
-					$emu_time_skiped = 0;
+					$cmd_abort = 1;
+					$cmd_abort_err = 1;
+					$emu_time_skip = 0;
+					$emu_time_skipped = 0;
+					$last_stuff_time = -1;
+					send("EMURS {$args[1]}");
+					break;
+				case 'EMUERROR':
+					show_error($args[1]);
 					break;
 			}
 		}
@@ -266,8 +270,9 @@ function do_stuff()
 		$emu_time_skipped++;
 		$emu_time_skip--;
 		send("SKIPT $emu_time_skipped");
+		send("SKIPL $emu_time_skip");
 	}
-	$seconds = time() + $emu_time_skipped;
+	$seconds = /*time() +*/ $emu_time_skipped;
 	if ($seconds - $last_stuff_time <= 0) return;
 
 	manage_heater();
@@ -292,8 +297,8 @@ function show_error($errno)
 	$motor_state = MOTOR_STOPPED;
 	while (!$cmd_abort_err)
 	{
-		sleep(1);
 		do_stuff();
+		usleep(1000);
 	}
 	$cmd_abort = 1;
 }
@@ -371,9 +376,11 @@ while (1)
 	}
 	$target_temperature = 0;
 	$motor_state = MOTOR_STOPPED;
+	$current_state = STATE_IDLE;
 	if ($cmd_abort)
 	{
 		$cmd_abort = 0;
+		send_stats();
 		/*
 		wdt_reset();
 		beeper_set_freq(1000);
@@ -383,7 +390,6 @@ while (1)
 		beeper_set_freq(0);
 		*/
 	}
-	$current_state = STATE_IDLE;
 //	$display_mode = DISPLAY_TIME;
 //	$display[4] = 0;
 	do_stuff();
