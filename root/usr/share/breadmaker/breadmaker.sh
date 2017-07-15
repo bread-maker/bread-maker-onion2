@@ -33,7 +33,7 @@ baked()
 write_stats()
 {
   local data=$@
-  if [ "$EMULATION" -eq "0" ]; then
+  if [ -z "$EMULATION" ]; then
   	sec=$(date +%s)
   else
   	sec=$(($START_TIME + $T))

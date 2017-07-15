@@ -2,8 +2,6 @@ FROM php:alpine
 
 EXPOSE 8000
 
-RUN mknod /tmp/breadmaker_from_device p
-
 ADD root/usr /usr
 RUN chmod 0777 /usr/share/breadmaker/breadmaker.sh
 
