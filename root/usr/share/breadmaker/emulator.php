@@ -268,8 +268,16 @@ function manage_heater()
 
 function do_stuff()
 {
-	global $last_stuff_time, $current_state, $delayed_secs, $passed_secs, $emu_time_skip, $emu_time_skipped, $emu_autorun;
+	global $last_stuff_time, $current_state, $delayed_secs, $passed_secs, $emu_time_skip, $emu_time_skipped, $emu_autorun, $last_stuff_time_real;
 	recv_routine();
+
+	if ($emu_autorun)
+	{
+		$seconds_real = time();	
+	        if ($seconds_real - $last_stuff_time_real > 0) $emu_time_skip += $seconds_real - $last_stuff_time_real;
+		$last_stuff_time_real = $seconds_real;
+	} else $last_stuff_time_real = time();
+
 	if ($emu_time_skip > 0)
 	{
 		$emu_time_skipped++;
@@ -277,10 +285,8 @@ function do_stuff()
 		send("SKIPT $emu_time_skipped");
 		send("SKIPL $emu_time_skip");
 	}
-        if ($emu_autorun)
-		$seconds = time();
-	else
-		$seconds = $emu_time_skipped;
+
+	$seconds = $emu_time_skipped;
 	if ($seconds - $last_stuff_time <= 0) return;
 
 	manage_heater();

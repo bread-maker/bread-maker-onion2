@@ -5,7 +5,11 @@
 
 	function auth_check($password_only = false)
 	{
-		if (isset($_REQUEST['password']))
+		if (EMULATION && isset($_REQUEST['forceauth']))
+		{
+			// force auth for emulator
+		}
+		else if (isset($_REQUEST['password']))
 		{
 			$password = $_REQUEST['password'];
 			if (!EMULATION)
