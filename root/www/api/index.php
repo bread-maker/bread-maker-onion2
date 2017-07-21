@@ -40,6 +40,8 @@
 		'firmware.flash' =>  array('firmware', 'flash'),
 		'emu.temp' =>  array('emucontrol', 'emu_set_temp'),
 		'emu.time' =>  array('emucontrol', 'emu_skip_time'),
+		'emu.run' =>  array('emucontrol', 'emu_skip_time'),
+		'emu.autorun' =>  array('emucontrol', 'emu_autorun'),
 		'emu.reset' =>  array('emucontrol', 'emu_reset'),
 		'emu.error' =>  array('emucontrol', 'emu_error'),
 	);

@@ -42,6 +42,16 @@
 		$result['result'] = true;
 	}
 
+	function emu_autorun()
+	{
+		global $result;
+		if (!isset($_REQUEST['enabled']))
+			error(ERROR_MISSED_ARGUMENT, 'enabled');
+		$autorun = (int)$_REQUEST['enabled'];
+		bmsend("EMUAUTORUN $autorun");
+		$result['result'] = true;
+	}
+
 	function emu_error()
 	{
 		global $result;

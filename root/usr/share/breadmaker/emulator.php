@@ -50,6 +50,7 @@ $pwm = 0;
 $heat = false;
 $emu_time_skip = 0;
 $emu_time_skipped = 0;
+$emu_autorun = 0;
 
 function send($str)
 {
@@ -86,7 +87,7 @@ $recv_buffer = '';
 
 function recv_routine()
 {
-	global $fifo_in, $recv_buffer, $current_state, $baking_program, $baking_program, $baking_beeps, $max_temperature_before_timer, $max_temperature_before_baking, $warming_temperature, $warming_max_time, $cmd_start, $cmd_abort, $cmd_abort_err, $program_number, $crust_number, $delayed_secs, $passed_secs, $current_temperature, $heat_speed, $emu_time_skip, $emu_time_skipped, $last_stuff_time;
+	global $fifo_in, $recv_buffer, $current_state, $baking_program, $baking_program, $baking_beeps, $max_temperature_before_timer, $max_temperature_before_baking, $warming_temperature, $warming_max_time, $cmd_start, $cmd_abort, $cmd_abort_err, $program_number, $crust_number, $delayed_secs, $passed_secs, $current_temperature, $heat_speed, $emu_time_skip, $emu_time_skipped, $last_stuff_time, $emu_autorun;
 	$data = fread($fifo_in, 1024);
 	if ($data)
 	{
@@ -150,11 +151,15 @@ function recv_routine()
 				case 'EMUTIME':
 					$emu_time_skip = $args[1];
 					break;
+				case 'EMUAUTORUN':
+					$emu_autorun = $args[1];
+					break;
 				case 'EMURESET':
 					$cmd_abort = 1;
 					$cmd_abort_err = 1;
 					$emu_time_skip = 0;
 					$emu_time_skipped = 0;
+					$emu_autorun = 0;
 					$last_stuff_time = -1;
 					send("EMURS {$args[1]}");
 					break;
@@ -263,7 +268,7 @@ function manage_heater()
 
 function do_stuff()
 {
-	global $last_stuff_time, $current_state, $delayed_secs, $passed_secs, $emu_time_skip, $emu_time_skipped;
+	global $last_stuff_time, $current_state, $delayed_secs, $passed_secs, $emu_time_skip, $emu_time_skipped, $emu_autorun;
 	recv_routine();
 	if ($emu_time_skip > 0)
 	{
@@ -272,7 +277,10 @@ function do_stuff()
 		send("SKIPT $emu_time_skipped");
 		send("SKIPL $emu_time_skip");
 	}
-	$seconds = /*time() +*/ $emu_time_skipped;
+        if ($emu_autorun)
+		$seconds = time();
+	else
+		$seconds = $emu_time_skipped;
 	if ($seconds - $last_stuff_time <= 0) return;
 
 	manage_heater();

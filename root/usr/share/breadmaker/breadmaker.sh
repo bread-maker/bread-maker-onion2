@@ -81,13 +81,13 @@ main()
     fast-gpio pwm $PIN_SCK 1 50
     stty -F $UART_OUT speed $UART_SETTINGS
     stty -F $UART_IN speed $UART_SETTINGS
-    trap "fast-gpio set-output $PIN_SCK" TERM KILL INT
+    trap "fast-gpio set-output $PIN_SCK ; exit 0" TERM KILL INT
   else
     [ -p $UART_OUT ] || mkfifo $UART_OUT
     [ -p $UART_IN ] || mkfifo $UART_IN
     $PHP emulator.php &
     EMU_PID=$!
-    trap "kill $EMU_PID" TERM KILL INT
+    trap "kill $EMU_PID ; exit 0" TERM KILL INT
   fi
 
   rm -f $STATS_DIR/breadmaker_stats_*
