@@ -42,6 +42,7 @@ $max_temperature_before_timer = 40;
 $max_temperature_before_baking = 40;
 $target_temperature = 0.0;
 $current_temperature = 26.0;
+$temperature_fixed = false;
 $heat_speed = 0;
 $pullup=false;
 $adc = 100;
@@ -87,7 +88,7 @@ $recv_buffer = '';
 
 function recv_routine()
 {
-	global $fifo_in, $recv_buffer, $current_state, $baking_program, $baking_program, $baking_beeps, $max_temperature_before_timer, $max_temperature_before_baking, $warming_temperature, $warming_max_time, $cmd_start, $cmd_abort, $cmd_abort_err, $program_number, $crust_number, $delayed_secs, $passed_secs, $current_temperature, $heat_speed, $emu_time_skip, $emu_time_skipped, $last_stuff_time, $emu_autorun;
+	global $fifo_in, $recv_buffer, $current_state, $baking_program, $baking_program, $baking_beeps, $max_temperature_before_timer, $max_temperature_before_baking, $warming_temperature, $warming_max_time, $cmd_start, $cmd_abort, $cmd_abort_err, $program_number, $crust_number, $delayed_secs, $passed_secs, $current_temperature, $heat_speed, $emu_time_skip, $emu_time_skipped, $last_stuff_time, $emu_autorun, $temperature_fixed;
 	$data = fread($fifo_in, 1024);
 	if ($data)
 	{
@@ -145,7 +146,11 @@ function recv_routine()
 					$cmd_abort_err = 1;
 					break;
 				case 'EMUTEMP':
-					$current_temperature = $args[1];
+					if ((int)$args[1])
+					{
+						$current_temperature = $args[1];
+						$temperature_fixed = true;
+					} else $temperature_fixed = false;
 					$heat_speed = 0;
 					break;
 				case 'EMUTIME':
@@ -240,23 +245,26 @@ function send_stats()
 
 function manage_heater()
 {
-	global $target_temperature, $current_temperature, $heat_speed, $pwm, $heat, $pullup, $adc, $res;
-	if ($target_temperature > $current_temperature)
+	global $target_temperature, $current_temperature, $heat_speed, $pwm, $heat, $pullup, $adc, $res, $temperature_fixed;
+	if (!$temperature_fixed)
 	{
-		if ($target_temperature - $current_temperature > 5) $pwm = 192;
-			else $pwm = (int)(($target_temperature - $current_temperature) * 32);
-		if ($heat_speed < 0.5) $heat_speed += 0.005 * $pwm / 192;
-		$heat = (time() % 32) < (int)($pwm/8);
-	} else {
-		$heat_speed -= 0.005;
-		if ($heat_speed < 0) $heat_speed = 0;
-		$pwm = 0;
-		$heat = false;
+		if ($target_temperature > $current_temperature)
+		{
+			if ($target_temperature - $current_temperature > 5) $pwm = 192;
+				else $pwm = (int)(($target_temperature - $current_temperature) * 32);
+			if ($heat_speed < 0.5) $heat_speed += 0.005 * $pwm / 192;
+			$heat = (time() % 32) < (int)($pwm/8);
+		} else {
+			$heat_speed -= 0.005;
+			if ($heat_speed < 0) $heat_speed = 0;
+			$pwm = 0;
+			$heat = false;
+		}
+		//echo("heat_speed: $heat_speed\n");
+		$current_temperature += $heat_speed;
+		if ($current_temperature > 25)
+			$current_temperature -= ($current_temperature-25)/1000;
 	}
-	//echo("heat_speed: $heat_speed\n");
-	$current_temperature += $heat_speed;
-	if ($current_temperature > 25)
-		$current_temperature -= ($current_temperature-25)/1000;
 	if ($current_temperature >= 90) $pullup = true;
 	if ($current_temperature <= 80) $pullup = false;
 	$res = (int)(100000 - ($current_temperature - 25) * 800);
