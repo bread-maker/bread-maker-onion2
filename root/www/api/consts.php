@@ -1,5 +1,5 @@
 <?php
-	define("ERROR_AUTH_REQURED", array('error_code' => 10, 'error_text' => 'Auth required', 'http_response_code' => 403));
+	define("ERROR_AUTH_REQURED", array('error_code' => 10, 'error_text' => 'Auth required', 'http_response_code' => 401));
 	define("ERROR_INVALID_PASSWORD", array('error_code' => 11, 'error_text' => 'Invalid password', 'http_response_code' => 401));
 	define("ERROR_INVALID_TOKEN", array('error_code' => 12, 'error_text' => 'Invalid token', 'http_response_code' => 401));
 	define("ERROR_TOKEN_EXPIRED", array('error_code' => 13, 'error_text' => 'Token expired', 'http_response_code' => 401));
