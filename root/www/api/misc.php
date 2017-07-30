@@ -7,13 +7,17 @@
 		shell_exec("sh -c 'echo $command > " . UART_OUT . "'");
 	}
 
-	function error($error, $what = '')
+	function error($error, $what = '', $uc_error_code = -1)
 	{
 		if (strlen($what) > 0) $error['error_text'] .= ': ' . $what; 
 		if (isset($error['http_response_code']))
 		{
 			http_response_code($error['http_response_code']);
 			unset($error['http_response_code']);
+		}
+		if ($uc_error_code >= 0)
+		{
+			$error['uc_error_code'] = $uc_error_code;
 		}
 		die(json_encode(array('error' => $error)));
 	}

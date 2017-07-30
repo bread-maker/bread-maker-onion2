@@ -23,7 +23,7 @@
 		require_once('stats.php');
 		$stats = get_stats();
 		if ($stats['last_status']->state == 'error')
-			error(ERROR_REMOTE_ERROR, $stats['last_status']->error_code . ' - ' . $remote_errors[$stats['last_status']->error_code]);
+			error(ERROR_REMOTE_ERROR, $stats['last_status']->error_code . ' - ' . $remote_errors[$stats['last_status']->error_code], $stats['last_status']->error_code);
 		if ($stats['last_status']->state != 'idle')
 			error(ERROR_INVALID_STATE, $stats['last_status']->state);
 
