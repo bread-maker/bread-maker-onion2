@@ -1,4 +1,10 @@
 <?php
+	if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+	    header('Access-Control-Allow-Origin: *');
+	    header('Access-Control-Allow-Methods: GET, HEAD, POST, PUT, DELETE, CONNECT, OPTIONS, TRACE, PATCH');
+	    header('Access-Control-Allow-Headers: *'); 
+	    die();
+	}
 	header('Content-Type: application/json');
 	header("access-control-allow-origin: *");
 	error_reporting(0);
