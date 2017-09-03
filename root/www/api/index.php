@@ -1,21 +1,23 @@
 <?php
-	if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
-	    header('Access-Control-Allow-Origin: *');
-	    header('Access-Control-Allow-Methods: GET, HEAD, POST, PUT, DELETE, CONNECT, OPTIONS, TRACE, PATCH');
-            header('Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept');
-	    die('');
-	}
 	header('Content-Type: application/json');
 	header("access-control-allow-origin: *");
 	error_reporting(0);
-	require_once('auth.php');
+	require_once('auth.php');	
+
+	$postdata = json_decode(file_get_contents("php://input"));
+	foreach($postdata as $k => $v)
+	{
+		if ((gettype($v) == 'array') || (gettype($v) == 'object'))
+			$_REQUEST[$k] = json_encode($v);
+		else
+			$_REQUEST[$k] = $v;
+	}
 
 	foreach($_REQUEST as $k => $v)
 	{
 		if (gettype($v) == 'array')
 			$_REQUEST[$k] = json_encode($v);
 	}
-
 
 	$methods = array(
 		'auth.login' => array('auth', 'auth'),
