@@ -4,7 +4,8 @@
 
 	function bmsend($command)
 	{
-		shell_exec("sh -c 'echo $command > " . UART_OUT . "'");
+		shell_exec("sh -c 'printf \"$command\n\" >> " . UART_OUT . "'");
+		usleep(50000);
 	}
 
 	function error($error, $what = '', $uc_error_code = -1)
