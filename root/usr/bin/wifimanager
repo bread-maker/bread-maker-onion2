@@ -1,0 +1,176 @@
+#!/bin/sh
+
+# function to connect to the first network in the match networks file
+#   enables configured network that was in the scan
+#   checks that connection was successful (wwan interface is up)
+#       if not successful:
+#           enable the AP network
+#           disable all STA networks
+# arguments:
+#   arg1 - if set to force, will enable connect force option (wifi setup must be triggered)
+
+# global variables: wifi libraries
+UCI="/sbin/uci"
+UBUS="/bin/ubus"
+IWINFO="/usr/bin/iwinfo"
+WIFI="/sbin/wifi"
+
+# global variable: internal
+bUsage=0
+bBoot=0
+bVerbose=0
+bTest=0
+bCheck=0
+
+# output files if necessary
+TEST_OUT=/root/int_tmp_test.txt
+
+_Print () {
+    if [ $bVerbose == 1 ]; then
+        echo $1 >&2
+    fi
+    if [ $bTest == 1 ]; then
+        echo $1 >> tmp_test.txt
+    fi
+}
+
+
+Usage () {
+    _Print "Omega2 Network Manager"
+    _Print " Attempts to automatically connect to any configured networks"
+    _Print ""
+    _Print "This will always run at boot"
+    _Print ""
+    _Print "Afterwards, it can be run manually if the networks around you have changed"
+    _Print " Run with no arguments and the following will be performed:"
+    _Print " - Scan for wifi networks"
+    _Print " - Check available networks from scan against configured networks"
+    _Print " - Attempt to connect to any available configured networks"
+    _Print " - If the connection is not successful:"
+    _Print "   - Try to connect to any other available configured networks"
+    _Print "   - If there are no other available configured networks, ensures the Omega's AP is enabled"
+    _Print ""
+    _Print "Use 'wifisetup' to configure your network settings"
+    _Print ""
+}
+
+# Use ubus command to look at the status of
+# wireless device. The "up" parameter should be true
+Wait () {
+    waitcount=0
+    waitflag=0
+    while [ "$waitcount" -le 20 ] &&
+        [ "$waitflag" == 0 ]; do
+        local ret=$($UBUS call network.device status '{"name":"ra0"}' | grep up )
+        echo $ret | grep -q "true" && res=found
+        if [ "$res" == "found" ];
+        then
+            _Print "radio0 is up"
+            waitflag=1
+        fi
+        sleep 1
+        waitcount=$((waitcount + 1))
+    done
+    echo $res
+}
+
+##########################################################
+##########################################################
+Regular_Seq () {
+
+    # CHECK THAT RADIO0 IS UP
+    init=$(iwpriv ra0 set SiteSurvey=1)
+    ret=$(Wait)
+    if [ "$ret" != "found" ]; then
+        _Print "radio0 is not up... try again later"
+        if [ $bTest == 1 ]; then
+            echo "radio0 not up, aborting" >> $TEST_OUT
+        fi
+        exit
+    fi
+
+    if [ $bCheck == 1 ]; then                                                                 
+        local conn=$($UBUS call network.interface.wwan status | grep \"up\" | grep -o ' .*,')
+        echo $conn | grep -q "true" && checked="true"                
+                                                                       
+        if [ "$checked" == "true" ] && ping -c 10 8.8.8.8; then                                 
+            _Print "Already connected to AP"                               
+            exit    
+        fi                                                      
+    fi 
+
+    local down=$($UBUS call network.interface.wwan down)
+    $(wifi &> /dev/null)
+    sleep 10
+    local up=$($UBUS call network.interface.wwan up)
+
+    _Print "Wifi manager finished"
+    exit
+}
+
+Boot_Seq () {
+    # wait until ra0 is up
+
+
+    # CHECK THAT radio0 IS UP
+    ret=$(Wait)
+    if [ "$ret" != "found" ]; then
+        _Print "radio0 is not up... try again later with regular sequence"
+        if [ $bTest == 1 ]; then
+            echo "radio0 not up, aborting" >> $TEST_OUT
+        fi
+        exit
+    fi    
+
+    local down=$($UBUS call network.interface.wwan down)
+    $(wifi &> /dev/null)
+    sleep 10
+    local up=$($UBUS call network.interface.wwan up)
+
+    exit
+}
+
+# parse arguments
+while [ "$1" != "" ]
+do
+    case "$1" in
+        -boot|boot)
+            bBoot=1
+            shift
+        ;;
+        -v|--v|verbose|-verbose|--verbose)
+            bVerbose=1
+            shift
+        ;;
+        -h|--h|help|-help|--help)
+            bVerbose=1
+            bUsage=1
+            shift
+        ;;
+        -t|--t|test|-test|--test)
+            bTest=1
+            shift
+        ;;
+        -c|--c|check|-check|--check)
+            bCheck=1
+            shift                                                                                     
+        ;; 
+        *)
+            echo "ERROR: Invalid Argument: $1"
+            shift
+            exit
+        ;;
+    esac
+done
+
+if [ $bUsage == 1 ]; then
+    Usage
+    exit
+fi
+
+if [ $bBoot == 1 ]; then
+    Boot_Seq
+else
+    Regular_Seq
+fi
+

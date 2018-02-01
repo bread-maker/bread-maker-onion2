@@ -1,10 +1,4 @@
 <?php
-	if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
-		header('Access-Control-Allow-Origin: *');
-		header('Access-Control-Allow-Methods: GET, HEAD, POST, PUT, DELETE, CONNECT, OPTIONS, TRACE, PATCH');
-		header('Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept');
-		die('');
-  	}
 	header('Content-Type: application/json');
 	header("access-control-allow-origin: *");
 	error_reporting(0);
@@ -35,10 +29,12 @@
 		'wifi.restart' => array('wifi', 'wifi_restart'),
 		'config.wifi.apkey.get' => array('wifi', 'wifi_ap_key_get'),
 		'config.wifi.apkey.set' => array('wifi', 'wifi_ap_key_set'),
-		'config.wifi.aps.get' => array('wifi', 'wifi_client_aps_get'),
-		'config.wifi.aps.add' => array('wifi', 'wifi_client_aps_add'),
-		'config.wifi.aps.edit' => array('wifi', 'wifi_client_aps_edit'),
-		'config.wifi.aps.delete' => array('wifi', 'wifi_client_aps_delete'),
+//		'config.wifi.aps.get' => array('wifi', 'wifi_client_aps_get'),
+//		'config.wifi.aps.add' => array('wifi', 'wifi_client_aps_add'),
+//		'config.wifi.aps.edit' => array('wifi', 'wifi_client_aps_edit'),
+//		'config.wifi.aps.delete' => array('wifi', 'wifi_client_aps_delete'),
+		'config.wifi.ap.get' => array('wifi', 'wifi_current_ap'),		
+		'config.wifi.ap.set' => array('wifi', 'wifi_ap_connect'),
 		'config.timezone.get' =>  array('misc', 'timezone_get', 'noauth' => true),
 		'config.timezone.set' =>  array('misc', 'timezone_set'),
 		'config.misc.get' =>  array('misc', 'config_misc_get', 'noauth' => true),

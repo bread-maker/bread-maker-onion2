@@ -12,11 +12,10 @@
 			$result['wifi_status'] = $status;
 		} else {
 			$up = false;
-			$config_file_name = SETTINGS_DIR . "/client_aps.json";
+			$config_file_name = SETTINGS_DIR . "/client_ap.json";
 			$config_json = @file_get_contents($config_file_name);
-			$aps = json_decode($config_json);
-			foreach($aps as $ap)
-				if ($ap->ssid == 'bread_router' && $ap->encryption == 'WPA2PSK' && $ap->key == 'breadkey') $up = true;			
+			$ap = json_decode($config_json);
+			if ($ap->ssid == 'bread_router' && $ap->encryption == 'WPA2PSK' && $ap->key == 'breadkey') $up = true;
 			if ($up)
 				$result['wifi_status'] = json_decode('{"up":true,"pending":false,"available":true,"autostart":true,"dynamic":false,"uptime":62821,"l3_device":"apcli0","proto":"dhcp","device":"apcli0","metric":0,"dns_metric":0,"delegation":true,"ipv4-address":[{"address":"10.13.1.10","mask":24}],"ipv6-address":[],"ipv6-prefix":[],"ipv6-prefix-assignment":[],"route":[{"target":"10.13.1.254","mask":32,"nexthop":"0.0.0.0","source":"10.13.1.10\/32"},{"target":"0.0.0.0","mask":0,"nexthop":"10.13.1.254","source":"10.13.1.10\/32"}],"dns-server":["10.13.1.254"],"dns-search":["lan"],"inactive":{"ipv4-address":[],"ipv6-address":[],"route":[],"dns-server":[],"dns-search":[]},"data":{"hostname":"Breadmaker","leasetime":43200}}');
 			else
@@ -69,6 +68,7 @@
 		}
 	}
 
+/*
 	function wifi_client_aps_get()
 	{
 		global $result;
@@ -224,6 +224,86 @@
 			} else $result['result'] = false;
 		}
 		wifi_client_aps_get();
+	}
+*/
+
+	function wifi_ap_connect()
+	{
+		global $result;
+		if (!isset($_REQUEST['ssid']))
+			error(ERROR_MISSED_ARGUMENT, 'ssid');
+		$ssid = $_REQUEST['ssid'];
+		if (isset($_REQUEST['key']))
+			$key = $_REQUEST['key'];
+		else
+			$key = '';
+		if (!isset($_REQUEST['encryption']))
+			error(ERROR_MISSED_ARGUMENT, 'encryption');
+		$encryption = $_REQUEST['encryption'];
+		switch (strtoupper($encryption))
+		{
+			case "WPA1PSKWPA2PSK":
+			case "WPA2PSK":
+			case "WPA2":
+			case "PSK2":
+				$encryption = "WPA2PSK";
+				break;
+			case "WPA1PSK":
+			case "WPA":
+			case "WPA1":
+			case "PSK":
+				$encryption = "WPA1PSK";
+				break;
+			case "WEP":
+				$encryption = "WEP";
+				break;
+			case "NONE":
+				$encryption = "NONE";
+				break;
+			default:
+				error(ERROR_INVALID_ARGUMENT, 'encryption');
+		}
+
+		if (($encryption != "NONE") && (strlen($key) == 0))
+			error(ERROR_MISSED_ARGUMENT, 'key');
+	
+		if (!EMULATION)
+		{
+			$ssid = str_replace("'", "\\'", $ssid);
+			$key = str_replace("'", "\\'", $key);
+			$r .= trim(shell_exec("uci set wireless.@wifi-iface[0].ApCliSsid='$ssid' 2>&1"));
+			$r .= trim(shell_exec("uci set wireless.@wifi-iface[0].ApCliPassWord='$key' 2>&1"));
+			$r .= trim(shell_exec("uci set wireless.@wifi-iface[0].ApCliAuthMode='$encryption' 2>&1"));
+			$r .= trim(shell_exec("uci set wireless.@wifi-iface[0].ApCliEnable=1 2>&1"));
+			$r .= trim(shell_exec("uci commit wireless.@wifi-config[0] 2>&1"));
+			header("Connection: close");
+			shell_exec("( sleep 2 ; wifimanager ) > /dev/null 2>/dev/null &");
+			$result['result'] = $r == '';
+		} else {
+			$config_file_name = SETTINGS_DIR . "/client_ap.json";
+			$config_json = @file_get_contents($config_file_name);
+			$ap = array("ssid" => $ssid, "key" => $key, "encryption" => $encryption);
+			file_put_contents($config_file_name, json_encode($ap));
+			$result['result'] = true;
+		}
+	}
+
+	function wifi_current_ap()
+	{
+		global $result;
+		if (!EMULATION)
+		{
+			$result["ssid"] = trim(shell_exec("uci -q get wireless.@wifi-iface[0].ApCliSsid"));
+			$result["encryption"] = trim(shell_exec("uci -q get wireless.@wifi-iface[0].ApCliAuthMode"));
+			$result["key"] = trim(shell_exec("uci -q get wireless.@wifi-iface[0].ApCliPassWord"));
+		} else {
+			$config_file_name = SETTINGS_DIR . "/client_ap.json";
+			$config_json = @file_get_contents($config_file_name);
+			$ap = json_decode($config_json);
+			$result["ssid"] = $ap->ssid;
+			$result["encryption"] = $ap->encryption;
+			$result["key"] = $ap->key;
+		}
 	}
 
 	function wifi_restart()
