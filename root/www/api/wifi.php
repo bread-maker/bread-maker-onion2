@@ -21,6 +21,17 @@
 			else
 				$result['wifi_status'] = json_decode('{"up":false}');
 		}
+		if (!EMULATION)
+		{
+			$result["ssid"] = trim(shell_exec("uci -q get wireless.@wifi-iface[0].ApCliSsid"));
+			$result["encryption"] = trim(shell_exec("uci -q get wireless.@wifi-iface[0].ApCliAuthMode"));
+		} else {
+			$config_file_name = SETTINGS_DIR . "/client_ap.json";
+			$config_json = @file_get_contents($config_file_name);
+			$ap = json_decode($config_json);
+			$result["ssid"] = $ap->ssid;
+			$result["encryption"] = $ap->encryption;
+		}
 	}
 
 	function wifi_scan()
@@ -285,24 +296,6 @@
 			$ap = array("ssid" => $ssid, "key" => $key, "encryption" => $encryption);
 			file_put_contents($config_file_name, json_encode($ap));
 			$result['result'] = true;
-		}
-	}
-
-	function wifi_current_ap()
-	{
-		global $result;
-		if (!EMULATION)
-		{
-			$result["ssid"] = trim(shell_exec("uci -q get wireless.@wifi-iface[0].ApCliSsid"));
-			$result["encryption"] = trim(shell_exec("uci -q get wireless.@wifi-iface[0].ApCliAuthMode"));
-			$result["key"] = trim(shell_exec("uci -q get wireless.@wifi-iface[0].ApCliPassWord"));
-		} else {
-			$config_file_name = SETTINGS_DIR . "/client_ap.json";
-			$config_json = @file_get_contents($config_file_name);
-			$ap = json_decode($config_json);
-			$result["ssid"] = $ap->ssid;
-			$result["encryption"] = $ap->encryption;
-			$result["key"] = $ap->key;
 		}
 	}
 
