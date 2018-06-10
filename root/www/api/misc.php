@@ -20,6 +20,8 @@
 		{
 			$error['uc_error_code'] = $uc_error_code;
 		}
+		if (!defined("BREADMAKER_WEB_API"))
+			throw new Exception($error['error_text']);
 		die(json_encode(array('error' => $error)));
 	}
 
@@ -34,6 +36,7 @@
 			$result['timezone'] =  @file_get_contents($tz_file_name);
 			if ($result['timezone'] == '') $result['timezone'] = 'GMT-3';
 		}
+		return $result['timezone'];
 	}
 
 	function timezone_set()
@@ -45,44 +48,14 @@
 		
 		if (!EMULATION)
 		{
-			shell_exec("uci get system.@system[0].timezone='$timezone'");
+			shell_exec("uci set system.@system[0].timezone=".escapeshellarg(trim($timezone)));
 			shell_exec('uci commit system.@system[0].timezone');
-			file_put_contents('/etc/TZ', $timezone);
+			shell_exec('/etc/init.d/system reload');
 			bmsend('TIME 255 0 0'); // Reset time
 		} else {
 			$tz_file_name = SETTINGS_DIR . "/tz";
 			@file_put_contents($tz_file_name, $timezone);
 		}
 		$result['result'] = true;
-	}
-
-	function config_misc_get()
-	{
-		global $result;
-		$settings_file_name = SETTINGS_DIR . "/settings.json";
-		$settings_json = @file_get_contents($settings_file_name);
-		$settings = json_decode($settings_json);
-		$result['config'] = $settings;
-	}
-
-	function config_misc_set()
-	{
-		global $result;
-		if (!isset($_REQUEST['key']))
-			error(ERROR_MISSED_ARGUMENT, 'key');
-		$key = $_REQUEST['key'];
-		if (!isset($_REQUEST['value']))
-			error(ERROR_MISSED_ARGUMENT, 'value');
-		$value = $_REQUEST['value'];
-
-		$settings_file_name = SETTINGS_DIR . "/settings.json";
-		$settings_json = @file_get_contents($settings_file_name);
-		$settings = json_decode($settings_json);
-		if ($value)
-			$settings->$key = $value;
-		else
-			unset($settings->$key);
-		file_put_contents($settings_file_name, json_encode($settings));
-		$result['config'] = $settings;
 	}
 ?>

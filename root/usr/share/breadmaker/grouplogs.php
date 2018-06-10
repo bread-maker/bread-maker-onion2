@@ -1,4 +1,5 @@
 <?php
+	//error_reporting(0);
 	$api_path = $argv[1];
 	$count = $argv[2];
 	require_once($api_path . '/config.php');
@@ -17,6 +18,11 @@
 	if ($count < count($stats))
 	{
 		$stats = array_slice($stats, count($stats) - $count);
+	}
+	if (!$stats)
+	{
+		file_put_contents("/tmp/debug_group_$count", $stats_json);
+		die();
 	}
 
 	$temperature = 0;

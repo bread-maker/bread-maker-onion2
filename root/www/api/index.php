@@ -1,4 +1,5 @@
 <?php
+	define("BREADMAKER_WEB_API", 1);
 	header('Content-Type: application/json');
 	header("access-control-allow-origin: *");
 	error_reporting(0);
@@ -27,22 +28,15 @@
 		'wifi.status' => array('wifi', 'wifi_status'),
 		'wifi.scan' => array('wifi', 'wifi_scan'),
 		'wifi.restart' => array('wifi', 'wifi_restart'),
-//		'config.wifi.apkey.get' => array('wifi', 'wifi_ap_key_get'),
 		'config.wifi.apkey.set' => array('wifi', 'wifi_ap_key_set'),
-//		'config.wifi.aps.get' => array('wifi', 'wifi_client_aps_get'),
-//		'config.wifi.aps.add' => array('wifi', 'wifi_client_aps_add'),
-//		'config.wifi.aps.edit' => array('wifi', 'wifi_client_aps_edit'),
-//		'config.wifi.aps.delete' => array('wifi', 'wifi_client_aps_delete'),
 		'config.wifi.ap.set' => array('wifi', 'wifi_ap_connect'),
 		'config.timezone.get' =>  array('misc', 'timezone_get', 'noauth' => true),
 		'config.timezone.set' =>  array('misc', 'timezone_set'),
-		'config.misc.get' =>  array('misc', 'config_misc_get', 'noauth' => true),
-		'config.misc.set' =>  array('misc', 'config_misc_set'),
 		'config.baking.global.get' => array('programs', 'global_config_get'),
 		'config.baking.global.set' => array('programs', 'global_config_set'),
-		'config.baking.stages.get' => array('programs', 'stages_get'),
-		'config.baking.stages.set' => array('programs', 'stages_set'),
-		'config.baking.stages.get.all' => array('programs', 'stages_get_all'),
+		'config.baking.stages.get' => array('programs', 'program_get'),
+//		'config.baking.stages.set' => array('programs', 'stages_set'),
+		'config.baking.stages.get.all' => array('programs', 'programs_get_all'),
 		'baking.bake' => array('commands', 'bake'),
 		'baking.abort' => array('commands', 'abort'),
 		'noerr' =>  array('commands', 'dismiss_error'),

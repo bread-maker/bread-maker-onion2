@@ -32,6 +32,7 @@
 			$result["ssid"] = $ap->ssid;
 			$result["encryption"] = $ap->encryption;
 		}
+		return $result;
 	}
 
 	function wifi_scan()
@@ -45,6 +46,10 @@
 			sleep(2);
 			$result['wifi_scan_result'] = json_decode('{"results":[{"channel":"1","ssid":"SHOGA","bssid":"c8:6c:87:43:31:b1","authentication":"AES","encryption":"WPA2PSK","signalStrength":"39","wirelessMode":"11b\/g\/n","ext-ch":"ABOVE"},{"channel":"1","ssid":"bread_router","bssid":"11:22:33:44:55:66","authentication":"TKIPAES","encryption":"WPA1PSKWPA2PSK","signalStrength":"63","wirelessMode":"11b\/g\/n","ext-ch":"NONE"},{"channel":"4","ssid":"MGTS_GPON_2421","bssid":"00:0e:8f:65:f5:8b","authentication":"AES","encryption":"WPA2PSK","signalStrength":"70","wirelessMode":"11b\/g\/n","ext-ch":"NONE"},{"channel":"4","ssid":"igrushka-wifi","bssid":"c4:6e:1f:b9:42:c0","authentication":"AES","encryption":"WPA2PSK","signalStrength":"57","wirelessMode":"11b\/g\/n","ext-ch":"ABOVE"},{"channel":"5","ssid":"WirelessNet","bssid":"fc:48:ef:95:0f:e8","authentication":"TKIPAES","encryption":"WPA1PSKWPA2PSK","signalStrength":"31","wirelessMode":"11b\/g\/n","ext-ch":"NONE"},{"channel":"5","ssid":"Hedgemade-mgts","bssid":"fc:48:ef:95:13:1c","authentication":"TKIPAES","encryption":"WPA1PSKWPA2PSK","signalStrength":"100","wirelessMode":"11b\/g\/n","ext-ch":"NONE"},{"channel":"5","ssid":"mgts-36","bssid":"70:54:f5:c5:4d:cc","authentication":"TKIPAES","encryption":"WPA1PSKWPA2PSK","signalStrength":"26","wirelessMode":"11b\/g\/n","ext-ch":"BELOW"},{"channel":"6","ssid":"Amaritta","bssid":"00:90:4c:c1:00:00","authentication":"TKIP","encryption":"WPA1PSKWPA2PSK","signalStrength":"18","wirelessMode":"11b\/g","ext-ch":"NONE"},{"channel":"6","ssid":"kv29","bssid":"fc:48:ef:95:13:58","authentication":"TKIPAES","encryption":"WPA1PSKWPA2PSK","signalStrength":"24","wirelessMode":"11b\/g\/n","ext-ch":"BELOW"},{"channel":"7","ssid":"mgts-27","bssid":"fc:48:ef:95:0d:18","authentication":"TKIPAES","encryption":"WPA1PSKWPA2PSK","signalStrength":"60","wirelessMode":"11b\/g","ext-ch":"NONE"},{"channel":"8","ssid":"WirelessNet","bssid":"fc:48:ef:95:0c:e6","authentication":"TKIPAES","encryption":"WPA1PSKWPA2PSK","signalStrength":"76","wirelessMode":"11b\/g\/n","ext-ch":"NONE"},{"channel":"10","ssid":"mgts-21","bssid":"70:54:f5:c4:ed:82","authentication":"TKIPAES","encryption":"WPA1PSKWPA2PSK","signalStrength":"0","wirelessMode":"11b\/g\/n","ext-ch":"NONE"}]}')->results;
 		}
+		usort($result['wifi_scan_result'],function($first,$second){
+			return $first->signalStrength < $second->signalStrength;
+		});
+		return $result['wifi_scan_result'];
 	}
 
 	function wifi_ap_key_get()
@@ -58,25 +63,29 @@
 			$config_file_name = SETTINGS_DIR . "/wifi_key";
 			$result['wifi_ap_key'] = @file_get_contents($config_file_name);
 		}
+		return $result['wifi_ap_key'];
 	}
 
 	function wifi_ap_key_set()
 	{
 		global $result;
 		if (!isset($_REQUEST['key']))
-			error(ERROR_INVALID_ARGUMENT);		
+			error(ERROR_INVALID_ARGUMENT);
 		$key = $_REQUEST['key'];
 		if (!EMULATION)
 		{
 			$key = str_replace("'", "\\'", $key);
-			$r = trim(shell_exec("uci set wireless.@wifi-iface[0].key='$key' 2>&1"));
+			$r = trim(shell_exec("uci set wireless.@wifi-iface[0].key=".escapeshellarg($key)." 2>&1"));
 			$r2 = trim(shell_exec("uci commit wireless.@wifi-iface[0].key 2>&1"));
+			header("Connection: close");
+			shell_exec("( sleep 2 ; wifimanager ) > /dev/null 2>/dev/null &");
 			$result['result'] = $r == '' && $r2 == '';
 		} else {
 			$config_file_name = SETTINGS_DIR . "/wifi_key";
 			$result['wifi_ap_key'] = @file_put_contents($config_file_name, $key);
 			$result['result'] = true;
 		}
+		return $result['result'];
 	}
 
 /*
@@ -282,9 +291,9 @@
 		{
 			$ssid = str_replace("'", "\\'", $ssid);
 			$key = str_replace("'", "\\'", $key);
-			$r .= trim(shell_exec("uci set wireless.@wifi-iface[0].ApCliSsid='$ssid' 2>&1"));
-			$r .= trim(shell_exec("uci set wireless.@wifi-iface[0].ApCliPassWord='$key' 2>&1"));
-			$r .= trim(shell_exec("uci set wireless.@wifi-iface[0].ApCliAuthMode='$encryption' 2>&1"));
+			$r .= trim(shell_exec("uci set wireless.@wifi-iface[0].ApCliSsid=".escapeshellarg($ssid)." 2>&1"));
+			$r .= trim(shell_exec("uci set wireless.@wifi-iface[0].ApCliPassWord=".escapeshellarg($key)." 2>&1"));
+			$r .= trim(shell_exec("uci set wireless.@wifi-iface[0].ApCliAuthMode=".escapeshellarg($encryption)." 2>&1"));
 			$r .= trim(shell_exec("uci set wireless.@wifi-iface[0].ApCliEnable=1 2>&1"));
 			$r .= trim(shell_exec("uci commit wireless.@wifi-config[0] 2>&1"));
 			header("Connection: close");
@@ -297,6 +306,7 @@
 			file_put_contents($config_file_name, json_encode($ap));
 			$result['result'] = true;
 		}
+		return $result;
 	}
 
 	function wifi_restart()

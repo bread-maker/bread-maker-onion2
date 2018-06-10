@@ -199,6 +199,12 @@ config interface 'wwan'
 	option ifname 'apcli0'
 	option proto 'dhcp'
 
+config route 'home'
+	option interface 'wwan'
+	option target '10.13.0.0'
+	option netmask '255.255.255.0'
+	option gateway '10.13.1.1'
+
 package onion
 
 config onion
@@ -206,12 +212,12 @@ config onion
 	option build '160'
 
 config console 'console'
-	option setup '0'
 	option install '0'
 	option editor '0'
 	option terminal '0'
 	option webcam '0'
 	option nodered '0'
+	option setup '1'
 
 package rpcd
 
@@ -224,12 +230,12 @@ config login
 package system
 
 config system
-	option timezone 'GMT0'
 	option ttylogin '0'
 	option log_size '64'
 	option urandom_seed '0'
 	option cronloglevel '8'
 	option hostname 'breadmaker'
+	option timezone 'Europe/Moscow'
 
 config timeserver 'ntp'
 	option enabled '1'
@@ -267,6 +273,8 @@ config uhttpd 'main'
 	option http_keepalive '20'
 	option tcp_keepalive '1'
 	option ubus_prefix '/ubus'
+	list interpreter '.php=/usr/bin/php-cgi'
+	option index_page 'index.php'
 
 config cert 'defaults'
 	option days '730'
@@ -295,6 +303,8 @@ config wifi-iface
 	option ApCliAuthMode 'WPA2PSK'
 	option ApCliEncrypType 'AES'
 	option ssid 'breadmaker'
+	option ApCliSsid 'none'
+	option ApCliEnable '1'
+	option ApCliPassWord 'nonenone'
 	option key 'breadtime'
-	option ApCliEnable '0'
 

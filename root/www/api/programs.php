@@ -3,149 +3,37 @@
 	require_once('consts.php');
 	require_once('misc.php');
 
-	function stage_get($program_id, $crust_id)
-	{
-		if ($program_id >= PROGRAMS_COUNT) error(ERROR_INVALID_ARGUMENT, 'program_id');
-		if ($crust_id >= CRUSTS_COUNT) error(ERROR_INVALID_ARGUMENT, 'crust_id');
-		
-		$program_file_name = SETTINGS_DIR . "/program.$program_id.$crust_id.json";
-		$program_json = @file_get_contents($program_file_name);
-		$program = json_decode($program_json);
-
-		$result = array();
-		$result['program_id'] = $program_id;
-		$result['crust_id'] = $crust_id;
-		$result['program_name'] = '';
-		$result['max_temp_a'] = null;
-		$result['max_temp_b'] = null;
-		$result['stages'] = array();
-		$result['beeps'] = array();
-		$result['warm_temp'] = null;
-		$result['max_warm_time'] = null;
-
-		if (isset($program->program_name))
-			$result['program_name'] = $program->program_name;
-		if (isset($program->max_temp_a) && ($program->max_temp_a !== null) && ($program->max_temp_a > 0))
-			$result['max_temp_a'] = $program->max_temp_a;
-		if (isset($program->max_temp_b) && ($program->max_temp_b !== null) && ($program->max_temp_b > 0))
-			$result['max_temp_b'] = $program->max_temp_b;
-		if (isset($program->stages))
-		{
-			$id = 0;
-			foreach($program->stages as $stage)
-			{
-				//$result['stages'][$id]['stage_id'] = $id;
-				$result['stages'][$id]['stage_name'] = $stage->stage_name;
-				$result['stages'][$id]['temp'] = $stage->temp ? $stage->temp : null;
-				$result['stages'][$id]['motor'] = $stage->motor;
-				$result['stages'][$id]['duration'] = $stage->duration;
-				$id++;
-			}
-		}
-		if (isset($program->beeps))
-		{
-			foreach($program->beeps as $beep)
-				$result['beeps'][] = array(
-					'stage' => $beep->stage,
-					'time' => $beep->time,
-					'count' => $beep->count
-				);
-		}
-		if (isset($program->warm_temp) && ($program->warm_temp !== null) && ($program->warm_temp >= 0))
-			$result['warm_temp'] = $program->warm_temp;
-		if (isset($program->max_warm_time) && ($program->max_warm_time !== null) && ($program->max_warm_time >= 0))
-			$result['max_warm_time'] = $program->max_warm_time;
-
-		return $result;
-	}
-
-	function stages_get()
+	function program_get($program_id = -1)
 	{
 		global $result;
-		if (!isset($_REQUEST['program_id']))
+		if ($program_id < 0 && !isset($_REQUEST['program_id']))
 			error(ERROR_MISSED_ARGUMENT, 'program_id');
-		if (!isset($_REQUEST['crust_id']))
-			error(ERROR_MISSED_ARGUMENT, 'crust_id');
-		$program_id = (int)$_REQUEST['program_id'];
-		$crust_id = (int)$_REQUEST['crust_id'];
-		if ($program_id >= PROGRAMS_COUNT) error(ERROR_INVALID_ARGUMENT, 'program_id');
-		if ($crust_id >= CRUSTS_COUNT) error(ERROR_INVALID_ARGUMENT, 'crust_id');
-		$result['program'] = stage_get($program_id, $crust_id);
+		else if (isset($_REQUEST['program_id']))
+			$program_id = (int)$_REQUEST['program_id'];
+		$programs_file_name = SETTINGS_DIR . "/programs.json";
+		$programs_json = @file_get_contents($programs_file_name);
+		$programs = json_decode($programs_json);
+		if (!isset($programs[$program_id]))
+			error(ERROR_INVALID_ARGUMENT, 'program_id');
+		$result['program'] = $programs[$program_id];
+		return $programs[$program_id];
 	}
 
-	function stages_get_all()
+	function programs_get_all()
 	{
 		global $result;
-		$programs = array();
-		for($program_id = 0; $program_id < PROGRAMS_COUNT; $program_id++)
-			for($crust_id = 0; $crust_id < CRUSTS_COUNT; $crust_id++)
-				$programs[] = stage_get($program_id, $crust_id);
+		$programs_file_name = SETTINGS_DIR . "/programs.json";
+		$programs_json = @file_get_contents($programs_file_name);
+		$programs = json_decode($programs_json);
 		$result['programs'] = $programs;
+		return $programs;
 	}
 
-	function stages_set()
+	function programs_set_all($programs)
 	{
-		global $result;
-		if (!isset($_REQUEST['program_id']))
-			error(ERROR_MISSED_ARGUMENT, 'program_id');
-		if (!isset($_REQUEST['crust_id']))
-			error(ERROR_MISSED_ARGUMENT, 'crust_id');
-		if (!isset($_REQUEST['program']))
-			error(ERROR_MISSED_ARGUMENT, 'program');
-		$program_id = (int)$_REQUEST['program_id'];
-		$crust_id = (int)$_REQUEST['crust_id'];
-		if ($program_id >= PROGRAMS_COUNT) error(ERROR_INVALID_ARGUMENT, 'program');
-		if ($crust_id >= CRUSTS_COUNT) error(ERROR_INVALID_ARGUMENT, 'crust');
-		$program = json_decode($_REQUEST['program']);
-		$program_out = array();
-		$program_out['program_name'] = '';
-		$program_out['max_temp_a'] = null;
-		$program_out['max_temp_b'] = null;
-		$program_out['stages'] = array();
-		$program_out['beeps'] = array();
-		$program_out['warm_temp'] = null;
-		$program_out['max_warm_time'] = null;
-
-		if (isset($program->program_name))
-			$program_out['program_name'] = $program->program_name;
-		if (isset($program->max_temp_a))
-			$program_out['max_temp_a'] = $program->max_temp_a;
-		if (isset($program->max_temp_b))
-			$program_out['max_temp_b'] = $program->max_temp_b;
-		if (isset($program->stages))
-		{
-			$id = 0;
-			foreach($program->stages as $stage)
-			{
-				$program_out['stages'][$id]['stage_id'] = $id;
-				$program_out['stages'][$id]['stage_name'] = $stage->stage_name;
-				$program_out['stages'][$id]['temp'] = (int)$stage->temp;
-				$program_out['stages'][$id]['motor'] = $stage->motor;
-				$program_out['stages'][$id]['duration'] = $stage->duration;
-				$id++;
-			}
-		}
-		if (isset($program->beeps))
-		{
-			foreach($program->beeps as $beep)
-				$program_out['beeps'][] = array(
-					'stage' => $beep->stage,
-					'time' => $beep->time,
-					'count' => $beep->count
-				);
-		}
-		if (isset($program->warm_temp))
-			$program_out['warm_temp'] = $program->warm_temp;
-		if (isset($program->max_warm_time))
-			$program_out['max_warm_time'] = $program->max_warm_time;
-
-		$program_file_name = SETTINGS_DIR . "/program.$program_id.$crust_id.json";
-		file_put_contents($program_file_name, json_encode($program_out));
-
-		$result['result'] = true;
-		$result['program_id'] = $program_id;
-		$result['crust_id'] = $crust_id;
-		$result['program'] = $program_out;
+		$programs_file_name = SETTINGS_DIR . "/programs.json";
+		$programs_json = json_encode($programs);
+		file_put_contents($programs_file_name, $programs_json);
 	}
 
 	function global_config_get()
@@ -155,14 +43,13 @@
 		$config_json = @file_get_contents($config_file_name);
 		$config = json_decode($config_json);
 		$keys = array('max_temp_a', 'max_temp_b', 'warm_temp', 'max_warm_time');
-		$result['config'] = array();
+		$result_c = array();
 		foreach($keys as $key)
 		{
-//			if (isset($config->$key))
-			{
-				$result['config'][$key] = $config->$key;
-			}
+			$result_c[$key] = $config->$key;
 		}
+		$result['config'] = $result_c;
+		return $result_c;
 	}
 
 	function global_config_set()
@@ -172,20 +59,20 @@
 			$new_config_json = $_REQUEST['config'];
 		else
 			$new_config_json = '{}';
-		$new_config = json_decode($new_config_json);
+		$new_config = json_decode($new_config_json, true);
 		$config_file_name = SETTINGS_DIR . "/global_config.json";
 		$old_config_json = @file_get_contents($config_file_name);
-		$old_config = json_decode($old_config_json);
+		$old_config = json_decode($old_config_json, true);
 		$keys = array('max_temp_a', 'max_temp_b', 'warm_temp', 'max_warm_time');
 		foreach($keys as $key)
 		{
-			if (isset($new_config->$key))
+			if (isset($new_config[$key]))
 			{
-				$old_config->$key = $new_config->$key;
+				$old_config[$key] = $new_config[$key];
 			}
 			if (isset($_REQUEST[$key]))
 			{
-				$old_config->$key = (int)$_REQUEST[$key];
+				$old_config[$key] = (int)$_REQUEST[$key];
 			}
 		}
 		file_put_contents($config_file_name, json_encode($old_config));

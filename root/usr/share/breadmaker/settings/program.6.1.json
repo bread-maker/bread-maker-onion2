@@ -1,1 +1,0 @@
-{"program_name":"Cake (light)","max_temp_a":-1,"max_temp_b":-1,"stages":[{"stage_id":0,"stage_name":"Bake","temp":100,"motor":"off","duration":3600},{"stage_id":1,"stage_name":"Cool","temp":50,"motor":"off","duration":1200}],"beeps":[],"warm_temp":0,"max_warm_time":0}

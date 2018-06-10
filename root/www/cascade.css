@@ -307,6 +307,27 @@ textarea#syslog {
 	margin-bottom: 1em;
 }
 
+#footer {
+	padding: 0.2em;
+	background: #000000;
+	color: #ffffff;
+	font-size: 80%;
+	border-width: 0 1px 1px 1px;
+	border-style: solid;
+	border-color: #444444;
+	text-align: right;
+}
+
+#maincontent {
+	padding: 0.5em;
+	background: #f5f5f5;
+	color: #000000;
+	font-size: 80%;
+	border-width: 0 1px 1px 1px;
+	border-style: solid;
+	border-color: #444444;
+}
+
 .cbi-section {
 	margin-bottom: 0.5em;
 	padding: 0.5em 1em;
@@ -365,7 +386,19 @@ input[type=submit],
 input[type=reset],
 input[type=image],
 input[type=button] {
+	vertical-align:bottom;
 	cursor: pointer;
+	height: 30px;
+}
+input[type=checkbox] {
+	vertical-align:bottom;
+}
+input[type=button]:disabled {
+	cursor: auto;
+	background-color: #C0C0C0;
+}
+input[type=number]:disabled {
+	background-color: #C0C0C0;
 }
 
 select,
@@ -539,35 +572,88 @@ table th {
 	color: #000000;
 }
 
-table.smalltext {
+table.border {
 	background: #f5f5f5;
 	color: #000000;
 	border-top: 1px solid #666666;
 	border-right: 1px solid #666666;
 	border-bottom: 1px solid #666666;
-	font-size: 90%;
-	width: 80%;
+	font-size: 1.5em;
 	margin-left: auto;
 	margin-right: auto;
 	border-collapse: collapse;
 }
 
-table.smalltext tr:hover td {
+table.border tr:hover td {
 	background-color: #bbddee;
 	color: #000000;
 }
 
-table.smalltext tr th {
-	padding: 0 0.25em;
+table.border tr th {
+	padding: 0 1.25em;
 	border-left: 1px solid #666666;
-	text-align: left;
+	text-align: center;
+	padding-top: 5px;
+	padding-bottom: 5px;
 }
 
-table.smalltext tr td {
-	padding: 0 0.25em;
+table.border tr td {
+	padding: 0 1.25em;
 	border-top: 1px solid #666666;
 	border-left: 1px solid #666666;
+	padding-top: 5px;
+	padding-bottom: 5px;
+	text-align: center;
+	white-space: nowrap;
 }
+
+table.noborder tr td {
+	text-align: left;
+	border-top: none;
+	border-left: none;
+	border-right: none;
+	border-bottom: none;
+	padding: 0 3px;
+	padding-top: 5px;
+	padding-bottom: 5px;
+	white-space: nowrap;
+}
+
+table.settings {
+	background: #f5f5f5;
+	color: #000000;
+	border-top: 1px solid #666666;
+	border-right: 1px solid #666666;
+	border-bottom: 1px solid #666666;
+	font-size: 1em;
+	margin-left: auto;
+	margin-right: auto;
+	border-collapse: collapse;
+}
+
+table.settings tr:hover td {
+	background-color: #bbddee;
+	color: #000000;
+}
+
+table.settings tr th {
+	padding: 0 1.25em;
+	border-left: 1px solid #666666;
+	text-align: center;
+	padding-top: 5px;
+	padding-bottom: 5px;
+	white-space: nowrap;
+}
+
+table.settings tr td {
+	padding: 0 1.25em;
+	border-top: 1px solid #666666;
+	border-left: 1px solid #666666;
+	padding-top: 5px;
+	padding-bottom: 5px;
+	white-space: nowrap;
+}
+
 
 table.cbi-section-table .cbi-rowstyle-1 {
 	background-color: #eeeeff;

@@ -63,7 +63,7 @@
 		if (!EMULATION)
 		{
 			$password = str_replace('"', '\"', $password);
-			$r = shell_exec("sh -c 'printf \"$password\n$password\" | passwd' 2>&1");
+			$r = shell_exec('sh -c "printf '.escapeshellarg($password.'\n'.$password).' | passwd" 2>&1');
 			if (strpos($r, 'password for root changed') > 0)
 				$result['result'] = true;
 			else

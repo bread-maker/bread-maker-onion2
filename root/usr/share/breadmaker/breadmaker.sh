@@ -19,8 +19,21 @@ program_selected()
   echo Selection: $@
   cd $API_DIR
   echo "<?php require_once('commands.php');
+	\$_REQUEST['program_id'] = $1;
+	\$_REQUEST['crust_id'] = $2;
+	\$_REQUEST['timer'] = $3;
+        bake();
+	print_r(\$result); ?>" | $PHP
+  cd $(dirname "$0")
+}
+
+duration()
+{
+  echo Duration requested: $@
+  cd $API_DIR
+  echo "<?php require_once('commands.php');
 	\$result = array();
-        bake($1, $2, $3);
+        duration($1);
 	print_r(\$result); ?>" | $PHP
   cd $(dirname "$0")
 }
@@ -107,6 +120,9 @@ main()
         ;;
       "SELCT")
         program_selected $data
+        ;;
+      "DURAT")
+        duration $data
         ;;
       "PROGR")
         echo $data > /tmp/breadmaker_program.json

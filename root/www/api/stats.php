@@ -2,8 +2,9 @@
 	require_once('config.php');
 	require_once('consts.php');
 	require_once('misc.php');
+	require_once('programs.php');
 
-	function get_program()
+	function get_current_program()
 	{
 		$program_file_name = STATS_DIR . '/breadmaker_program.json';
 		if (!file_exists($program_file_name)) return NULL;
@@ -13,24 +14,20 @@
 
 	function get_stats($interval = 'last', $count = 100)
 	{
-		global $remote_errors;
-
-		$program_r = get_program();
-		if ($program_r != NULL)
+		try
 		{
-			$program_id = $program_r->program_id;
-	                $crust_id = $program_r->crust_id;
-
-			$program_file_name = SETTINGS_DIR . "/program.$program_id.$crust_id.json";
-			$program_json = @file_get_contents($program_file_name);
-			$program = json_decode($program_json);
-			$program->program_id = $program_r->program_id;
-			$program->crust_id = $program_r->crust_id;
-			$program->max_temp_a = $program_r->max_temp_a;
-			$program->max_temp_b = $program_r->max_temp_b;
-	                $program->warm_temp = $program_r->warm_temp;
-			$program->max_warm_time = $program_r->max_warm_time;
-		} else $program = NULL;
+			$program_r = get_current_program();
+			if ($program_r)
+			{
+				$program = program_get($program_r->program_id);
+				$program_r->program_name = $program->program_name;
+				foreach($program_r->stages as $k => $stage)
+					$program_r->stages[$k]->stage_name = $program->stages[$k]->stage_name;
+			}
+		}
+		catch (Exception $e) {
+			$program_r = null;
+		}
 
 		if ($interval != 'last')
 		{
@@ -53,7 +50,7 @@
 			foreach($stats as $k => $stat)
 			{
 				if ($stats[$k]->state == 'error')
-					$stats[$k]->error_text = $remote_errors[$stats[$k]->error_code];
+					$stats[$k]->error_text = REMOTE_ERRORS[$stats[$k]->error_code];
 				if ($stats[$k]->target_temp == 0)
 					$stats[$k]->target_temp = null;
 			}
@@ -70,11 +67,11 @@
 		$last = json_decode($stats_json);
 
 		if ($last->state == 'error')
-			$last->error_text = $remote_errors[$last->error_code];
+			$last->error_text = REMOTE_ERRORS[$last->error_code];
 		if ($last->target_temp == 0)
 			$last->target_temp = null;
 
-		return array('last_program' => $program, 'stats' => $stats, 'last_status' => $last);
+		return array('last_program' => $program_r, 'stats' => $stats, 'last_status' => $last);
 	}
 
 	function stats()
