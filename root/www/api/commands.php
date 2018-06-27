@@ -67,10 +67,9 @@
 				case "onoff": $motor = 1; break;
 				case "on": $motor = 2; break;
 			}
-			$temp = 0;
+			$temp = $stage->temp;
 			switch ($crust_id)
 			{
-				case 0: $temp = $stage->temp; break;
 				case 1: if (isset($stage->temp_b)) $temp = $stage->temp_b; break;
 				case 2: if (isset($stage->temp_c)) $temp = $stage->temp_c; break;
 			}
